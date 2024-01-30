@@ -1,0 +1,39 @@
+#!/bin/python3
+
+import os
+from openai import OpenAI
+
+with open('source/key', 'r') as key:
+    client = OpenAI(
+        api_key=key.read().rstrip()
+    )
+
+chat_completion = client.chat.completions.create(
+    messages=[
+        {
+            "role": "user",
+            "content": "What is the Racket programming language?"
+        }
+    ],
+    model="gpt-3.5-turbo",
+)
+
+result_path = os.open('results', os.O_RDONLY)
+
+
+def opener(path, flags):
+    return os.open(path, flags, dir_fd=result_path)
+
+
+with open('results.json', 'x', opener=opener) as f:
+    print("""{
+  "score": 50.0,
+  "tests":
+    [
+      {
+        "output": "%s"
+      }
+    ]
+}""" % chat_completion, file=f)
+
+os.close(result_path)
