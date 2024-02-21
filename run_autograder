@@ -3,43 +3,66 @@
 import os
 from openai import OpenAI
 import json
+import argparse
 
-with open('submission/src.rkt', 'r') as sub:
-    text = sub.read()
-
-with open('source/key', 'r') as key:
-    client = OpenAI(
-        api_key=key.read().rstrip()
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        prog='FeedBot autograder'
     )
 
-chat_completion = client.chat.completions.create(
-    messages=[
-        {
-            "role": "user",
-            "content": "Can you point out any flaws in this Racket code?\n\n" + text,
-        }
-    ],
-    model="gpt-3.5-turbo",
-)
+    parser.add_argument('-l', '--local', action='store_true')
 
-answer = chat_completion.choices[0].message.content
+    args = parser.parse_args()
 
-result_path = os.open('results', os.O_RDONLY)
+    if args.local:
+        with open('test_src.rkt', 'r') as sub:
+            text = sub.read()
+    else:
+        with open('submission/src.rkt', 'r') as sub:
+            text = sub.read()
+
+    if args.local:
+        with open('key', 'r') as key:
+            client = OpenAI(
+                api_key=key.read().rstrip()
+            )
+    else:
+        with open('source/key', 'r') as key:
+            client = OpenAI(
+                api_key=key.read().rstrip()
+            )
+
+    chat_completion = client.chat.completions.create(
+        messages=[
+            {
+                "role": "user",
+                "content": "Can you point out any flaws in this Racket code?\n\n" + text,
+            }
+        ],
+        model="gpt-3.5-turbo",
+    )
+
+    answer = chat_completion.choices[0].message.content
+
+    if args.local:
+        result_path = os.open('.', os.O_RDONLY)
+    else:
+        result_path = os.open('results', os.O_RDONLY)
 
 
-def opener(path, flags):
-    return os.open(path, flags, dir_fd=result_path)
+    def opener(path, flags):
+        return os.open(path, flags, dir_fd=result_path)
 
-output = {
-    "score": 50.0,
-    "tests": [
-        {
-            "output": answer,
-        },
-    ],
-}
+    output = {
+        "score": 50.0,
+        "tests": [
+            {
+                "output": answer,
+            },
+        ],
+    }
 
-with open('results.json', 'x', opener=opener) as f:
-    print(json.dumps(output), file=f)
+    with open('results.json', 'x', opener=opener) as f:
+        print(json.dumps(output), file=f)
 
-os.close(result_path)
+    os.close(result_path)

@@ -1,0 +1,1 @@
+(define CONST "o.o")
