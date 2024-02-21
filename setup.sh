@@ -1,1 +1,1 @@
-pip install openai
+pip install openai requests
