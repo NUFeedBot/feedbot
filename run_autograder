@@ -6,6 +6,40 @@ import json
 import argparse
 import requests
 
+
+# Gets a response from OpenAI, given the OpenAI client, a prompt, and code
+# (OpenAI, str, str) -> str
+def get_comment(client, prompt, code):
+    chat_completion = client.chat.completions.create(
+        messages=[
+            {
+                "role": "user",
+                "content": prompt + text,
+            }
+        ],
+        model="gpt-3.5-turbo",
+    )
+
+    return chat_completion.choices[0].message.content
+
+
+# Sends a POST request to the given URL, using the given list of comments
+# (str (URL), List[Comment]) -> Response
+def send_request(url, comments):
+    addendum = 'entry'
+
+    request_obj = {
+        'code': text,
+        'comments': json.dumps(
+            {
+                "comments": comments
+            }
+        ),
+    }
+
+    return requests.post(url + "/" + addendum, params=request_obj)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         prog='FeedBot autograder'
@@ -38,43 +72,21 @@ if __name__ == "__main__":
                 api_key=key.read().rstrip()
             )
 
-    chat_completion = client.chat.completions.create(
-        messages=[
-            {
-                "role": "user",
-                "content": "Can you point out any flaws in this Racket code?\n\n" + text,
-            }
-        ],
-        model="gpt-3.5-turbo",
+    answer = get_comment(
+        client,
+        "Can you point out any flaws in this Racket code?\n\n",
+        text
     )
 
-    answer = chat_completion.choices[0].message.content
-
-    if args.local:
-        result_path = os.open('.', os.O_RDONLY)
-    else:
-        result_path = os.open('results', os.O_RDONLY)
-
-    def opener(path, flags):
-        return os.open(path, flags, dir_fd=result_path)
-
-    addendum = 'entry'
-
-    request_obj = {
-        'code': text,
-        'comments': json.dumps(
+    x = send_request(
+        args.url,
+        [
             {
-                "comments": [
-                    {
-                        "line_number": 0,
-                        "text": answer
-                    }
-                ]
+                "line_number": 0,
+                "text": answer
             }
-        ),
-    }
-
-    x = requests.post(args.url + "/" + addendum, params=request_obj)
+        ]
+    )
 
     output = {
         "score": 50.0,
@@ -84,6 +96,14 @@ if __name__ == "__main__":
             },
         ],
     }
+
+    if args.local:
+        result_path = os.open('.', os.O_RDONLY)
+    else:
+        result_path = os.open('results', os.O_RDONLY)
+
+    def opener(path, flags):
+        return os.open(path, flags, dir_fd=result_path)
 
     with open('results.json', 'x', opener=opener) as f:
         print(json.dumps(output), file=f)
