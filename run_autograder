@@ -4,6 +4,7 @@ import os
 from openai import OpenAI
 import json
 import argparse
+import requests
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -11,6 +12,11 @@ if __name__ == "__main__":
     )
 
     parser.add_argument('-l', '--local', action='store_true')
+    parser.add_argument(
+        '-u',
+        '--url',
+        default='https://feedbot-website-lively-firefly-3841.fly.dev/'
+    )
 
     args = parser.parse_args()
 
@@ -49,15 +55,32 @@ if __name__ == "__main__":
     else:
         result_path = os.open('results', os.O_RDONLY)
 
-
     def opener(path, flags):
         return os.open(path, flags, dir_fd=result_path)
+
+    addendum = 'entry'
+
+    request_obj = {
+        'code': text,
+        'comments': json.dumps(
+            {
+                "comments": [
+                    {
+                        "line_number": 0,
+                        "text": answer
+                    }
+                ]
+            }
+        ),
+    }
+
+    x = requests.post(args.url + "/" + addendum, params=request_obj)
 
     output = {
         "score": 50.0,
         "tests": [
             {
-                "output": answer,
+                "output": x.text,
             },
         ],
     }
