@@ -7,9 +7,23 @@ import argparse
 import requests
 
 
+DEFAULT_PROMPTS = {
+    'data_design': 'Give feedback on the following Racket code in terms of its'
+        + ' adherence to the principles of data design and'
+        + ' its design decisions:\n\n',
+    'implementation': 'Give feedback on the following Racket code in terms of'
+        + ' how well it follows the design recipe and its design'
+        + ' decisions:\n\n',
+    'list_abstraction': 'Give feedback on these Racket list abstractions:\n\n',
+}
+
+
 # Gets a response from OpenAI, given the OpenAI client, a prompt, and code
-# (OpenAI, str, str) -> str
-def get_comment(client, prompt, code):
+# (OpenAI, dict, int, str) -> str
+def get_comment(client, config, problem_no, code):
+    prompt = get_problem_prompt(config, problem_no)
+    text = get_problem_text(code, problem_no)
+
     chat_completion = client.chat.completions.create(
         messages=[
             {
@@ -40,6 +54,30 @@ def send_request(url, comments):
     return requests.post(url + "/" + addendum, params=request_obj)
 
 
+# Gets the text of the given problem from the code
+# (str, int) -> str
+def get_problem_text(code, problem_no):
+    beginning = code.find(f";;- Begin problem {problem_no}")
+    end = code.find(f";;- End problem {problem_no}")
+    return code[beginning:end]
+
+
+# Gets the prompt for the given problem_no in the config
+# (dict, int) -> str
+def get_problem_prompt(config, problem_no):
+    prompts = config.get('prompts')
+    problem = config.get('problems')[problem_no]
+    return prompts.get(problem.get('problem_type'))
+
+
+# Returns a correct configuration or prints error msg and quits
+# dict -> dict
+def normalize_config(config):
+    ret = config.copy()
+    ret.setdefault('prompts', DEFAULT_PROMPTS)
+    return ret
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         prog='FeedBot autograder'
@@ -53,6 +91,15 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
+
+    if args.local:
+        with open('config.json', 'r') as conf:
+            config = json.loads(conf.read())
+    else:
+        with open('source/config.json', 'r') as conf:
+            config = json.loads(conf.read())
+
+    config = normalize_config(config)
 
     if args.local:
         with open('test_src.rkt', 'r') as sub:
@@ -71,10 +118,11 @@ if __name__ == "__main__":
             client = OpenAI(
                 api_key=key.read().rstrip()
             )
-
+    
     answer = get_comment(
         client,
-        "Can you point out any flaws in this Racket code?\n\n",
+        config,
+        0,
         text
     )
 
@@ -105,7 +153,7 @@ if __name__ == "__main__":
     def opener(path, flags):
         return os.open(path, flags, dir_fd=result_path)
 
-    with open('results.json', 'x', opener=opener) as f:
+    with open('results.json', 'w', opener=opener) as f:
         print(json.dumps(output), file=f)
 
     os.close(result_path)
