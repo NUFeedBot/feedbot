@@ -8,12 +8,12 @@ import requests
 
 
 DEFAULT_PROMPTS = {
-    'data_design': 'Give feedback on the following Racket code in terms of its'
-        + ' adherence to the principles of data design and'
-        + ' its design decisions:\n\n',
-    'implementation': 'Give feedback on the following Racket code in terms of'
-        + ' how well it follows the design recipe and its design'
-        + ' decisions:\n\n',
+    'data_design': 'Give feedback on the following code written in the Beginning'
+        + ' Student Language Dialect of Racket in terms of its'
+        + ' adherence to the Data Design Recipe from the textbook How to Design Programs:\n\n',
+    'implementation': 'Give feedback on the following code written in the Beginning'
+        + ' Student Language Dialect of Racket in terms of how well it follows'
+        + ' the Design Recipe from the textbook How to Design Programs:\n\n',
     'list_abstraction': 'Give feedback on these Racket list abstractions:\n\n',
 }
 
@@ -31,7 +31,7 @@ def get_comment(client, config, problem_no, code):
                 "content": prompt + text,
             }
         ],
-        model="gpt-3.5-turbo",
+        model="gpt-4",
     )
 
     return chat_completion.choices[0].message.content
