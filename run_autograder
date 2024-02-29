@@ -5,9 +5,19 @@ from openai import OpenAI
 import json
 import argparse
 import requests
+from assignmentdata import AssignmentStatement, InvalidSubmission
+from slicesubmission import slice_submission
+import pprint
 
 
 DEFAULT_PROMPTS = {
+    'general':'Give feedback on the following code written in the Beginning'
+        + ' Student Language Dialect of Racket in terms of its'
+        + ' adherence to the Design Recipe from the textbook How to Design Programs.\n',
+    'statement':'The problem statement given to the student was:\n',
+    'code':'The student\'s code for this problem was:\n\n',
+
+
     'data_design': 'Give feedback on the following code written in the Beginning'
         + ' Student Language Dialect of Racket in terms of its'
         + ' adherence to the Data Design Recipe from the textbook How to Design Programs:\n\n',
@@ -19,10 +29,10 @@ DEFAULT_PROMPTS = {
 
 
 # Gets a response from OpenAI, given the OpenAI client, a prompt, and code
-# (OpenAI, dict, int, str) -> str
-def get_comment(client, config, problem_no, code):
+# (OpenAI, dict, int, Submission) -> str
+def get_comment(client, config, problem_no, sub):
     prompt = get_problem_prompt(config, problem_no)
-    text = get_problem_text(code, problem_no)
+    text = get_problem_text(sub, problem_no)
 
     chat_completion = client.chat.completions.create(
         messages=[
@@ -34,16 +44,18 @@ def get_comment(client, config, problem_no, code):
         model="gpt-4",
     )
 
+    print(prompt + text)
+
     return chat_completion.choices[0].message.content
 
 
 # Sends a POST request to the given URL, using the given list of comments
 # (str (URL), List[Comment]) -> Response
-def send_request(url, comments):
+def send_request(url, code, comments):
     addendum = 'entry'
 
     request_obj = {
-        'code': text,
+        'code': code,
         'comments': json.dumps(
             {
                 "comments": comments
@@ -55,19 +67,15 @@ def send_request(url, comments):
 
 
 # Gets the text of the given problem from the code
-# (str, int) -> str
+# (Submission, int) -> str
 def get_problem_text(code, problem_no):
-    beginning = code.find(f";;- Begin problem {problem_no}")
-    end = code.find(f";;- End problem {problem_no}")
-    return code[beginning:end]
+    return code.get_problem(problem_no)
 
 
 # Gets the prompt for the given problem_no in the config
 # (dict, int) -> str
 def get_problem_prompt(config, problem_no):
-    prompts = config.get('prompts')
-    problem = config.get('problems')[problem_no]
-    return prompts.get(problem.get('problem_type'))
+    return DEFAULT_PROMPTS['general'] + DEFAULT_PROMPTS['statement'] + config['assignment'].problems[problem_no].statement + '\n\n' + DEFAULT_PROMPTS['code']
 
 
 # Returns a correct configuration or prints error msg and quits
@@ -75,6 +83,8 @@ def get_problem_prompt(config, problem_no):
 def normalize_config(config):
     ret = config.copy()
     ret.setdefault('prompts', DEFAULT_PROMPTS)
+    ret.setdefault('assignment', {})
+    ret['assignment'] = AssignmentStatement(ret['assignment'])
     return ret
 
 
@@ -102,11 +112,11 @@ if __name__ == "__main__":
     config = normalize_config(config)
 
     if args.local:
-        with open('test_src.rkt', 'r') as sub:
-            text = sub.read()
+        subdata = slice_submission('test_src.rkt')
     else:
-        with open('submission/src.rkt', 'r') as sub:
-            text = sub.read()
+        subdata = slice_submission('submission/src.rkt')
+    if not subdata.has_all_problems(range(len(config['assignment'].problems))):
+        raise InvalidSubmission("Submission does not have all problems", -1)
 
     if args.local:
         with open('key', 'r') as key:
@@ -122,12 +132,13 @@ if __name__ == "__main__":
     answer = get_comment(
         client,
         config,
-        0,
-        text
+        0, # Currently hardcoded problem number
+        subdata
     )
 
     x = send_request(
         args.url,
+        subdata.full_code,
         [
             {
                 "line_number": 0,
@@ -141,12 +152,19 @@ if __name__ == "__main__":
         "tests": [
             {
                 "output": x.text,
+                # "answer": answer # <-- use this to get output without needing to have the server set up 
             },
         ],
     }
 
+    
+
     if args.local:
         result_path = os.open('.', os.O_RDONLY)
+        
+        # The above was causing an error for me so I used this instead
+        # with open('results.json', 'w') as f:
+        #     json.dump(output, f)
     else:
         result_path = os.open('results', os.O_RDONLY)
 
