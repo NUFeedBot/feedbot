@@ -7,46 +7,8 @@ import argparse
 import requests
 from assignmentdata import AssignmentStatement, InvalidSubmission
 from slicesubmission import slice_submission
+from generateprompts import get_comment
 import pprint
-
-
-DEFAULT_PROMPTS = {
-    'general':'Give feedback on the following code written in the Beginning'
-        + ' Student Language Dialect of Racket in terms of its'
-        + ' adherence to the Design Recipe from the textbook How to Design Programs.\n',
-    'statement':'The problem statement given to the student was:\n',
-    'code':'The student\'s code for this problem was:\n\n',
-
-
-    'data_design': 'Give feedback on the following code written in the Beginning'
-        + ' Student Language Dialect of Racket in terms of its'
-        + ' adherence to the Data Design Recipe from the textbook How to Design Programs:\n\n',
-    'implementation': 'Give feedback on the following code written in the Beginning'
-        + ' Student Language Dialect of Racket in terms of how well it follows'
-        + ' the Design Recipe from the textbook How to Design Programs:\n\n',
-    'list_abstraction': 'Give feedback on these Racket list abstractions:\n\n',
-}
-
-
-# Gets a response from OpenAI, given the OpenAI client, a prompt, and code
-# (OpenAI, dict, int, Submission) -> str
-def get_comment(client, config, problem_no, sub):
-    prompt = get_problem_prompt(config, problem_no)
-    text = get_problem_text(sub, problem_no)
-
-    chat_completion = client.chat.completions.create(
-        messages=[
-            {
-                "role": "user",
-                "content": prompt + text,
-            }
-        ],
-        model="gpt-4",
-    )
-
-    print(prompt + text)
-
-    return chat_completion.choices[0].message.content
 
 
 # Sends a POST request to the given URL, using the given list of comments
@@ -66,23 +28,10 @@ def send_request(url, code, comments):
     return requests.post(url + "/" + addendum, params=request_obj)
 
 
-# Gets the text of the given problem from the code
-# (Submission, int) -> str
-def get_problem_text(code, problem_no):
-    return code.get_problem(problem_no)
-
-
-# Gets the prompt for the given problem_no in the config
-# (dict, int) -> str
-def get_problem_prompt(config, problem_no):
-    return DEFAULT_PROMPTS['general'] + DEFAULT_PROMPTS['statement'] + config['assignment'].problems[problem_no].statement + '\n\n' + DEFAULT_PROMPTS['code']
-
-
 # Returns a correct configuration or prints error msg and quits
 # dict -> dict
 def normalize_config(config):
     ret = config.copy()
-    ret.setdefault('prompts', DEFAULT_PROMPTS)
     ret.setdefault('assignment', {})
     ret['assignment'] = AssignmentStatement(ret['assignment'])
     return ret
@@ -132,7 +81,6 @@ if __name__ == "__main__":
     answer = get_comment(
         client,
         config,
-        0, # Currently hardcoded problem number
         subdata
     )
 
@@ -162,7 +110,7 @@ if __name__ == "__main__":
     if args.local:
         result_path = os.open('.', os.O_RDONLY)
         
-        # The above was causing an error for me so I used this instead
+        # The above was causing an error for me so I used this instead - Chris
         # with open('results.json', 'w') as f:
         #     json.dump(output, f)
     else:
