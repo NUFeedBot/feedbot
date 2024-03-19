@@ -29,10 +29,12 @@ class ProblemStatement:
         self.title = json_has_or(jsondata, "title", str, "")
         self.stub = json_has_or(jsondata, "stub", str, "")
         self.tags = json_has_or(jsondata, "tags", list, [])
-        # TODO: dependencies?
+        self.dependencies = json_has_or(jsondata, "dependencies", list, [])
 
         for tag in self.tags:
             if not isinstance(tag, str): raise InvalidData("Tags must be strings")
+        for dep in self.dependencies:
+            if not isinstance(dep, int): raise InvalidData("Dependencies must be ints")
 
 class AssignmentStatement:
     def __init__(self, jsondata):
@@ -49,8 +51,8 @@ class Submission:
         # the entire code
         self.full_code = code
         # the entire code, split into sections
-        # {prob: int, code: str}
-        # where int is the problem index or -1 if it's outside of a problem
+        # {prob: int, code: str, linenum: int}
+        # where prob is the problem index or -1 if it's outside of a problem
         self.all_sections = secs
     
     def has_problem(self, no):
@@ -61,15 +63,9 @@ class Submission:
     
     def get_problem(self, no):
         for sec in self.all_sections:
-            if sec['prob'] == no: return sec['code']
+            if sec['prob'] == no: return sec
 
         return "[Problem not found]" # TODO: throw an error?
-
-    # TODO Helper functions for:
-    # - Checking that all problems are present
-    # - Extracting a certain problem
-    # - Validate against an AssignmentStatement
-    # - Other desired manipulations of the list of sections?
     
 
 

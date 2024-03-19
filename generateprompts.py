@@ -67,20 +67,42 @@ def screen_code(client, code):
     return 'true' == json.loads(chat_response.choices[0].message.tool_calls[0].function.arguments)['satisfies']
 
 # Gets a response from OpenAI, given the OpenAI client, a prompt, and code
-# (OpenAI, dict, Submission) -> str
-def get_comment(client, config, sub):
-    problem_no = 0 # currently hardcoded single problem number
-    statement = get_problem(config, problem_no)
-    code = get_problem_code(sub, problem_no)
+# probs is a list of problems to check. If omitted, all problems are tested
+# (OpenAI, dict, Submission, probs=list[int]) -> list[dict]
+def get_comment(client, config, sub, probs=None):
+    res = []
+    if probs is None:
+        probs = range(len(config["assignment"].problems))
+    for i in probs:
+        res.append(get_comment_on_prob(client, config, sub, i))
+        # print(res[-1])
+    return res
 
-    screened = screen_code(client,code)
+# Gets a response from OpenAI for a particular problem number, given the OpenAI client, a prompt, and code
+# (OpenAI, dict, Submission, int) -> dict
+def get_comment_on_prob(client, config, sub, problem_no):
+    statement = get_problem(config, problem_no)
+    prob = get_problem_code(sub, problem_no)
+
+    # print(f"Start screen {problem_no}")
+    screened = screen_code(client, prob["code"])
+    # print(f"End screen {problem_no}")
+    res = {
+        "prob": problem_no,
+        "line_number": prob["linenum"],
+        "text": "none"
+    }
 
     if screened:
-        return "Code looks good"
+        res["text"] = "Code looks good"
     else:
-        prompt = get_prompt(statement, code)
-
-        return make_api_request(client, prompt)
+        prompt = get_prompt(statement, prob["code"])
+        
+        # print(f"Start req {problem_no}")
+        res["text"] = make_api_request(client, prompt)
+        # print(f"End req {problem_no}")
+    
+    return res
 
 # Gets the problem statement for the given problem_no in the config
 # (dict, int) -> ProblemStatement

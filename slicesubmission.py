@@ -11,11 +11,12 @@ def slice_submission(subpath):
         linenum = 1
 
         def add_sec():
-            nonlocal secs, content, prob_num
+            nonlocal secs, content, prob_num, linenum
             if prob_num != -1 or content.strip() != "":
                 secs.append({
                     "prob": -1 if prob_num == -1 else prob_num - 1,
-                    "code": content
+                    "code": content,
+                    "linenum": linenum
                 })
             content = ""
 
