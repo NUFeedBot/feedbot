@@ -1,4 +1,24 @@
+import json
 
+tools = [
+    {
+        "type": "function",
+        "function": {
+            "name": "htdp_design_recipe",
+            "description": "Function to call with a boolean indicating whether the code satisfies the Design Recipe from the textbook How To Design Programs",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "satisfies": {
+                        "type": "string",
+                        "enum": ["true", "false"],
+                        "description": "'true' if the source code written in the Beginning Student Language Dialect of Racket satisfies the Design Recipe, 'false' if it does not satisfy the design recipe"
+                    }
+                },
+                "required": ["satisfies"]
+            },
+        }
+    }]
 
 
 DEFAULT_PROMPTS = {
@@ -28,10 +48,23 @@ def make_api_request(client, prompt):
                 "content": prompt,
             }
         ],
-        model="gpt-4",
+        model="gpt-4-turbo-preview",
     )
 
     return chat_completion.choices[0].message.content
+
+# Checks if code satisfies DR
+def screen_code(client, code):
+    messages = []
+    messages.append({"role": "system", "content": "Don't make assumptions about what values to plug into functions. Ask for clarification if a user request is ambiguous."})
+    messages.append({"role": "user", "content": "Call the appropriate function with the following student code: \n\n" + code})
+    chat_response = client.chat.completions.create(
+        model="gpt-4-turbo-preview",
+        messages=messages,
+        tools=tools,
+        tool_choice={"type": "function", "function": {"name": "htdp_design_recipe"}}
+    )
+    return 'true' == json.loads(chat_response.choices[0].message.tool_calls[0].function.arguments)['satisfies']
 
 # Gets a response from OpenAI, given the OpenAI client, a prompt, and code
 # (OpenAI, dict, Submission) -> str
@@ -40,9 +73,14 @@ def get_comment(client, config, sub):
     statement = get_problem(config, problem_no)
     code = get_problem_code(sub, problem_no)
 
-    prompt = get_prompt(statement, code)
+    screened = screen_code(client,code)
 
-    return make_api_request(client, prompt)
+    if screened:
+        return "Code looks good"
+    else:
+        prompt = get_prompt(statement, code)
+
+        return make_api_request(client, prompt)
 
 # Gets the problem statement for the given problem_no in the config
 # (dict, int) -> ProblemStatement

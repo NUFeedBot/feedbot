@@ -123,3 +123,7 @@ if __name__ == "__main__":
         print(json.dumps(output), file=f)
 
     os.close(result_path)
+
+    if args.local:
+        # NOTE: this is fragile, of course, but useful in the intermediate
+        print(args.url + "/submission/" + json.loads(x.text)['msg'][4:])
