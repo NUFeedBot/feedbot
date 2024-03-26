@@ -11,18 +11,21 @@
             {
                 "statement": "Design a function `validate-match` that returns true if and only if a match is valid. For a valid match, there must be exactly two teams and they must each have at least one but at most ten players. Additionally, no players may be present multiple times (i.e. there can't be two players with the same name).",
                 "stub": "(define (validate-match ...) ...)",
-                "dependencies": [0]
+                "dependencies": [0],
+                "tags": ["FD"]
+
             },
             {
                 "statement": "Design a function `strength-diff` that returns the absolute value of the difference in total strength between two teams in a match. The total strength is the sum of the strength scores of all players on a team.",
                 "stub": "(define (strength-diff ...) ...)",
                 "dependencies": [0],
-                "tags": ["LA"]
+                "tags": ["LA", "FD"]
             },
             {
                 "statement": "Using the following data definition for a match result, design a function `play-match` that returns the appropriate result for a match. The result is determined as follows:\n- If the game is not valid (as defined in `validate-match`), the result is invalid\n- If one team's strength score exceeds the other by 100 or more, that team wins\n- If not, then the team with the highest total endurance score wins\n- If the stength and endurance scores are exactly the same, the game is a draw",
                 "stub": "; A MatchResult is one of:\n; - \"invalid\"\n; - \"draw\"\n; - \"team-1-wins\"\n; - \"team-2-wins\"\n\n(define (play-match ...) ...)",
-                "dependencies": [0,1,2]
+                "dependencies": [0,1,2],
+                "tags": ["FD"]
             }
         ]
     }
