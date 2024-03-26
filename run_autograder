@@ -1,7 +1,7 @@
 #!/bin/python3
 
 import os
-from openai import OpenAI
+from openai import AsyncOpenAI
 import json
 import argparse
 import requests
@@ -9,6 +9,7 @@ from assignmentdata import AssignmentStatement, InvalidSubmission
 from slicesubmission import slice_submission
 from generateprompts import get_comment
 import pprint
+import asyncio
 
 # Sends a POST request to the given URL, using the given list of comments
 # (str (URL), List[Comment]) -> Response
@@ -54,12 +55,12 @@ def submit_file(submission_path, config_path,
          open("key" if is_local else "source/key", 'r') as key:
 
         config = normalize_config(json.loads(config_file.read()))
-        client = OpenAI(api_key=key.read().rstrip())
+        client = AsyncOpenAI(api_key=key.read().rstrip())
         subdata = slice_submission(submission_path)
         if not subdata.has_all_problems(range(len(config['assignment'].problems))):
             raise InvalidSubmission("Submission does not have all problems", -1)
 
-        answer = get_comment(client, config, subdata, probs)
+        answer = asyncio.run(get_comment(client, config, subdata, probs))
 
         output = {}
 

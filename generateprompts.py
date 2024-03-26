@@ -1,4 +1,6 @@
 import json
+import asyncio
+
 
 tools = [
     {
@@ -40,8 +42,8 @@ DEFAULT_PROMPTS = {
 
 # Makes an API request with the given string prompt
 # (OpenAI, str) -> str
-def make_api_request(client, prompt):
-    chat_completion = client.chat.completions.create(
+async def make_api_request(client, prompt):
+    chat_completion = await client.chat.completions.create(
         messages=[
             {
                 "role": "user",
@@ -54,11 +56,11 @@ def make_api_request(client, prompt):
     return chat_completion.choices[0].message.content
 
 # Checks if code satisfies DR
-def screen_code(client, code):
+async def screen_code(client, code):
     messages = []
     messages.append({"role": "system", "content": "Don't make assumptions about what values to plug into functions. Ask for clarification if a user request is ambiguous."})
     messages.append({"role": "user", "content": "Call the appropriate function with the following student code: \n\n" + code})
-    chat_response = client.chat.completions.create(
+    chat_response = await client.chat.completions.create(
         model="gpt-4-turbo-preview",
         messages=messages,
         tools=tools,
@@ -69,23 +71,21 @@ def screen_code(client, code):
 # Gets a response from OpenAI, given the OpenAI client, a prompt, and code
 # probs is a list of problems to check. If omitted, all problems are tested
 # (OpenAI, dict, Submission, probs=list[int]) -> list[dict]
-def get_comment(client, config, sub, probs=None):
+async def get_comment(client, config, sub, probs=None):
     res = []
     if probs is None:
         probs = range(len(config["assignment"].problems))
-    for i in probs:
-        res.append(get_comment_on_prob(client, config, sub, i))
-        # print(res[-1])
-    return res
+
+    return await asyncio.gather(*[get_comment_on_prob(client, config, sub, i) for i in probs])
 
 # Gets a response from OpenAI for a particular problem number, given the OpenAI client, a prompt, and code
 # (OpenAI, dict, Submission, int) -> dict
-def get_comment_on_prob(client, config, sub, problem_no):
+async def get_comment_on_prob(client, config, sub, problem_no):
     statement = get_problem(config, problem_no)
     prob = get_problem_code(sub, problem_no)
 
     # print(f"Start screen {problem_no}")
-    screened = screen_code(client, prob["code"])
+    screened = await screen_code(client, prob["code"])
     # print(f"End screen {problem_no}")
     res = {
         "prob": problem_no,
@@ -99,7 +99,7 @@ def get_comment_on_prob(client, config, sub, problem_no):
         prompt = get_prompt(statement, prob["code"])
         
         # print(f"Start req {problem_no}")
-        res["text"] = make_api_request(client, prompt)
+        res["text"] = await make_api_request(client, prompt)
         # print(f"End req {problem_no}")
     
     return res
