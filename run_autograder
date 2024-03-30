@@ -110,30 +110,33 @@ if __name__ == "__main__":
         '--url',
         default='https://feedbot-website-lively-firefly-3841.fly.dev/'
     )
+    parser.add_argument('-s', '--src', default="test_src.rkt")
+    parser.add_argument('-c', '--config', default="config.json")
+    parser.add_argument('-p', '--prompt', default="promptconfigs/system_role.json")
 
     args = parser.parse_args()
 
     if args.local:
         # This configuration works like the local we had before
-        submit_file("test_src.rkt", "config.json", "promptconfigs/system_role.json",
-                    post_url=args.url, 
-                    output_path="results.json", 
-                    is_local=True)
+        # submit_file(args.src, args.config, args.prompt,
+        #             post_url=args.url, 
+        #             output_path="results.json", 
+        #             is_local=True)
         
         # This configuration is useful for just testing feedback
         # It makes no post request and no file writing, it just prints the feedback to console
-        # submit_file("test_src.rkt", "config.json", "promptconfigs/system_role.json", is_local=True, print_feedback=True)
+        # submit_file(args.src, args.config, args.prompt, is_local=True, print_feedback=True)
 
         # You can select specific problems to run if you want
         # Running all problems can take a long time
-        # submit_file("test_src.rkt", "config.json", "promptconfigs/system_role.json", is_local=True, print_feedback=True, probs=[0])
+        # submit_file(args.src, args.config, args.prompt, is_local=True, print_feedback=True, probs=[0])
 
         # This one prints the feedback and dumps it to JSON
-        # submit_file("test_src.rkt", "config.json", "promptconfigs/system_role.json",
-        #             is_local=True, 
-        #             print_feedback=True, 
-        #             dump_feedback=True, 
-        #             output_path="results.json")
+        submit_file(args.src, args.config, args.prompt,
+                    is_local=True, 
+                    print_feedback=True, 
+                    dump_feedback=True, 
+                    output_path="results.json")
     else:
         # This would be the configuration for the actual autograder (I may have broken it though)
         submit_file("source/test_src.rkt", "source/config.json", "source/promptconfigs/system_role.json", args.url, "results/results.json")
