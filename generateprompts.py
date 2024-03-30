@@ -28,33 +28,29 @@ def lookup_screening_fun(typ):
     else:
         return "general_design_recipe"
 
-DEFAULT_PROMPTS = {
-    'general':'Give feedback on the following code written in the Beginning'
-        + ' Student Language Dialect of Racket in terms of its'
-        + ' adherence to the Design Recipe from the textbook How to Design Programs.\n',
-    'statement':'The problem statement given to the student was:\n',
-    'code':'The student\'s code for this problem was:\n\n',
+DEFAULT_PROMPT_CONFIG = {
+    "system": "Give feedback to a student in a programming class. DO NOT answer with code. Address the student using \"you\", \"your\", etc.",
 
+    "general": "Give feedback on the following code written in the Beginning Student Language Dialect of Racket in terms of its adherence to the Design Recipe from the textbook How to Design Programs. The sturent was instructed to respond to the following problem statement:\n",
+    "general#DD": "Note that this problem focuses specifically on data design.",
+    "general#LA": "Note that this problem focuses specifically on the correct use of list abstractions.",
 
-    'data_design': 'Give feedback on the following code written in the Beginning'
-        + ' Student Language Dialect of Racket in terms of its'
-        + ' adherence to the Data Design Recipe from the textbook How to Design Programs:\n\n',
-    'implementation': 'Give feedback on the following code written in the Beginning'
-        + ' Student Language Dialect of Racket in terms of how well it follows'
-        + ' the Design Recipe from the textbook How to Design Programs:\n\n',
-    'list_abstraction': 'Give feedback on these Racket list abstractions:\n\n',
+    "pre_statement": "The student was instructed to respond to the following problem statement:\n",
+    "post_statement": "\n\n",
+
+    "pre_code": "The student's code for this problem was:\n",
+    "post_code": "\n\nRemember, do not write any code for the student"
 }
 
 # Makes an API request with the given string prompt
-# (OpenAI, str) -> str
-async def make_api_request(client, prompt):
+# (OpenAI, str, str) -> str
+async def make_api_request(client, prompt, sysmsg=None):
+    messages=[]
+    if sysmsg is not None:
+        messages.append({ "role": "system", "content": sysmsg })
+    messages.append({ "role": "user", "content": prompt })
     chat_completion = await client.chat.completions.create(
-        messages=[
-            {
-                "role": "user",
-                "content": prompt,
-            }
-        ],
+        messages=messages,
         model="gpt-4-turbo-preview",
     )
 
@@ -76,20 +72,19 @@ async def screen_code(client, typ, code):
 # Gets a response from OpenAI, given the OpenAI client, a prompt, and code
 # probs is a list of problems to check. If omitted, all problems are tested
 # (OpenAI, dict, Submission, probs=list[int]) -> list[dict]
-async def get_comment(client, config, sub, probs=None):
-    res = []
+async def get_comment(client, config, sub, probs=None, prompt_config=None):
     if probs is None:
         probs = range(len(config["assignment"].problems))
 
-    return await asyncio.gather(*[get_comment_on_prob(client, config, sub, i) for i in probs])
+    return await asyncio.gather(*[get_comment_on_prob(client, config, sub, i, prompt_config) for i in probs])
 
 # Gets a response from OpenAI for a particular problem number, given the OpenAI client, a prompt, and code
 # (OpenAI, dict, Submission, int) -> dict
-async def get_comment_on_prob(client, config, sub, problem_no):
+async def get_comment_on_prob(client, config, sub, problem_no, prompt_config):
     statement = get_problem(config, problem_no)
     prob = get_problem_code(sub, problem_no)
 
-    if "FD" in statement.tags:
+    if False and "FD" in statement.tags:
         screened = await screen_code(client, "function", prob["code"])
         res = {
             "prob": problem_no,
@@ -103,9 +98,11 @@ async def get_comment_on_prob(client, config, sub, problem_no):
             "text": "none"
         }
 
-        prompt = get_prompt(statement, prob["code"])
-        
-        res["text"] = await make_api_request(client, prompt)
+        if prompt_config is None:
+            prompt_config = DEFAULT_PROMPT_CONFIG
+
+        prompt = get_prompt_using_config(statement, prob["code"], prompt_config)
+        res["text"] = await make_api_request(client, prompt, prompt_config["system"])
 
     return res
 
@@ -119,11 +116,23 @@ def get_problem(config, problem_no):
 def get_problem_code(code, problem_no):
     return code.get_problem(problem_no)
 
-# Creates a prompt for OpenAI from a problem statement and code
-# (ProblemStatement, str) -> str
-def get_prompt(problem, code):
-    return DEFAULT_PROMPTS['general'] \
-        + DEFAULT_PROMPTS['statement'] \
-        + problem.statement + '\n\n' \
-        + DEFAULT_PROMPTS['code'] \
-        + code
+# Generates a prompt from the problem, code, and config
+# (ProblemStatement, str, dict) -> str
+def get_prompt_using_config(problem, code, prompt_config):
+    return get_prompt_for("general", problem, prompt_config) \
+        + get_prompt_for("pre_statement", problem, prompt_config) \
+        + problem.statement \
+        + get_prompt_for("post_statement", problem, prompt_config) \
+        + get_prompt_for("pre_code", problem, prompt_config) \
+        + code \
+        + get_prompt_for("post_code", problem, prompt_config)
+
+# Gets the prompt info for a certain config attribute name
+# names followed by #TAG will also be included if the problem has that tag
+# (str, ProblemStatement, dict) -> str
+def get_prompt_for(name, problem, prompt_config):
+    text = prompt_config[name]
+    for tag in problem.tags:
+        if (name + "#" + tag) in prompt_config:
+            text += prompt_config[name + "#" + tag]
+    return text
