@@ -1,6 +1,6 @@
 import json
 import asyncio
-
+import re
 
 tools = [
     {
@@ -103,8 +103,17 @@ async def get_comment_on_prob(client, config, sub, problem_no, prompt_config):
 
         prompt = get_prompt_using_config(statement, prob["code"], prompt_config)
         res["text"] = await make_api_request(client, prompt, prompt_config["system"])
+        res["text"] = redact_codeblocks(res["text"])
 
     return res
+
+# Given a string, replaces all markdown code blocks with "[CODE REDACTED]"
+# str -> str
+def redact_codeblocks(text):
+    # Regular expression pattern to match markdown code blocks
+    codeblock_pattern = r'```(?:.*)\n([\s\S]*?)```'
+    redacted_text = re.sub(codeblock_pattern, "[CODE REDACTED]", text)
+    return redacted_text
 
 # Gets the problem statement for the given problem_no in the config
 # (dict, int) -> ProblemStatement
