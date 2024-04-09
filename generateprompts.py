@@ -101,7 +101,7 @@ async def get_comment_on_prob(client, config, sub, problem_no, prompt_config):
         if prompt_config is None:
             prompt_config = DEFAULT_PROMPT_CONFIG
 
-        prompt = get_prompt_using_config(statement, prob["code"], prompt_config)
+        prompt = get_prompt_using_config(statement, prob["code"], config, prompt_config)
         res["text"] = await make_api_request(client, prompt, prompt_config["system"])
         res["text"] = redact_codeblocks(res["text"])
 
@@ -126,9 +126,12 @@ def get_problem_code(code, problem_no):
     return code.get_problem(problem_no)
 
 # Generates a prompt from the problem, code, and config
-# (ProblemStatement, str, dict) -> str
-def get_prompt_using_config(problem, code, prompt_config):
+# (ProblemStatement, str, dict, dict) -> str
+def get_prompt_using_config(problem, code, config, prompt_config):
     return get_prompt_for("general", problem, prompt_config) \
+        + get_prompt_for("pre_context", problem, prompt_config) \
+        + config['assignment'].context \
+        + get_prompt_for("post_context", problem, prompt_config) \
         + get_prompt_for("pre_statement", problem, prompt_config) \
         + problem.statement \
         + get_prompt_for("post_statement", problem, prompt_config) \

@@ -5,6 +5,9 @@
     "general#DD": "Note that this problem focuses specifically on data design.",
     "general#LA": "Note that this problem focuses specifically on the correct use of list abstractions.",
 
+    "pre_context": "\n\n",
+    "post_context": "\n\n",
+
     "pre_statement": "The student was instructed to respond to the following problem statement:\n",
     "post_statement": "\n\n",
 

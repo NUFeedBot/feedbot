@@ -44,6 +44,7 @@ class AssignmentStatement:
 
         self.lang = json_has_or(jsondata, "lang", str, "#lang htdp/bsl") # Maybe don't need lang if we want language-agnosticism?
         self.title = jsondata["title"]
+        self.context = json_has_or(jsondata, "context", str, "")
         self.problems = [ProblemStatement(prob) for prob in jsondata["problems"]]
 
 class Submission:

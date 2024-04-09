@@ -113,6 +113,7 @@ if __name__ == "__main__":
     parser.add_argument('-s', '--src', default="test_src.rkt")
     parser.add_argument('-c', '--config', default="config.json")
     parser.add_argument('-p', '--prompt', default="promptconfigs/system_role.json")
+    parser.add_argument('-r', '--result', default="results.json")
 
     args = parser.parse_args()
 
@@ -136,7 +137,7 @@ if __name__ == "__main__":
                     is_local=True, 
                     print_feedback=True, 
                     dump_feedback=True, 
-                    output_path="results.json")
+                    output_path=args.result)
     else:
         # This would be the configuration for the actual autograder (I may have broken it though)
         submit_file("source/test_src.rkt", "source/config.json", "source/promptconfigs/system_role.json", args.url, "results/results.json")
