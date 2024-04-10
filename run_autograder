@@ -121,7 +121,7 @@ if __name__ == "__main__":
         # This configuration works like the local we had before
         # submit_file(args.src, args.config, args.prompt,
         #             post_url=args.url, 
-        #             output_path="results.json", 
+        #             output_path=args.result, 
         #             is_local=True)
         
         # This configuration is useful for just testing feedback
