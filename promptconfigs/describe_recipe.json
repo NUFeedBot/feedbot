@@ -13,5 +13,5 @@
     "post_statement": "\n\n",
     
     "pre_code": "The student's code for this problem was:\n",
-    "post_code": "\n\nRemember, you are giving SMALL feedback on the code to help the student learn. Do not tell them the answer, and do not write any code for them. Check over your response at the end to ensure that it is concise, and that if there is an issue with the code you have identified a single specific step of the design recipe for the student to work on, and provideh feedback for that step."
+    "post_code": "\n\nRemember, you are giving SMALL feedback on the code to help the student learn. Do not tell them the answer, and do not write any code for them. Check over your response at the end to ensure that it is concise, and that if there is an issue with the code you have identified a single specific step of the design recipe for the student to work on, and provide feedback for that step. Also remember to address the student directly, in the second person."
 }
