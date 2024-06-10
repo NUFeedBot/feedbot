@@ -51,7 +51,7 @@ async def make_api_request(client, prompt, sysmsg=None):
     messages.append({ "role": "user", "content": prompt })
     chat_completion = await client.chat.completions.create(
         messages=messages,
-        model="gpt-4-turbo-preview",
+        model="gpt-4o",
     )
 
     return chat_completion.choices[0].message.content

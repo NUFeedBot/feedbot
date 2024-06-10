@@ -1,4 +1,4 @@
-#!/bin/python3
+#!/bin/python
 
 import os
 from openai import AsyncOpenAI
@@ -53,7 +53,7 @@ def submit_file(submission_path, config_path,
     dump_feedback = dump_feedback is True
 
     with open(config_path, 'r') as config_file, \
-         open("key" if is_local else "source/key", 'r') as key:
+         open("key" if is_local else "key", 'r') as key:
 
         config = normalize_config(json.loads(config_file.read()))
         client = AsyncOpenAI(api_key=key.read().rstrip())
@@ -89,8 +89,7 @@ def submit_file(submission_path, config_path,
                     },
                 ],
             }
-            if is_local:
-                print(post_url + "/submission/" + json.loads(response.text)['msg'][4:])
+            print(post_url + "/submission/" + json.loads(response.text)['msg'][4:])
 
         if dump_feedback:
             output["feedback"] = answer
@@ -108,7 +107,7 @@ if __name__ == "__main__":
     parser.add_argument(
         '-u',
         '--url',
-        default='https://feedbot-website-lively-firefly-3841.fly.dev/'
+        default='https://feedbot.dbp.io/'
     )
     parser.add_argument('-s', '--src', default="test_src.rkt")
     parser.add_argument('-c', '--config', default="config.json")
@@ -140,4 +139,4 @@ if __name__ == "__main__":
                     output_path=args.result)
     else:
         # This would be the configuration for the actual autograder (I may have broken it though)
-        submit_file("source/test_src.rkt", "source/config.json", "source/promptconfigs/system_role.json", args.url, "results/results.json")
+        submit_file("test_src.rkt", "config.json", "promptconfigs/system_role.json", args.url, "results.json")
