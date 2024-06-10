@@ -6,6 +6,14 @@ in order to generate comments, you'll need to make an OpenAI API key and put it 
 
 you'll also need to install the requests and openai python packages.
 
+Easiest is to set up a virtual environment with:
+
+``` python
+python -m venv .venv
+source .venv/bin/activate
+python install -r requirements.txt
+```
+
 ## running
 
 ### local
