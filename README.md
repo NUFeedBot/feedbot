@@ -11,28 +11,45 @@ Easiest is to set up a virtual environment with:
 ``` python
 python -m venv .venv
 source .venv/bin/activate
-python install -r requirements.txt
+pip install -r requirements.txt
 ```
 
 ## running
 
-### local
+To run locally, printing to stdout:
 
-to run the autograder locally, tack the `--local` option. you also likely want to tack `--url` in order to specify a locally running version of the server.
+``` python
+python main.py -d -s test_src.rkt -a test_assign.json -c config.json 
+```
+
+To run locally, printing to `results.json`
+
+``` python
+python main.py -s test_src.rkt -a test_assign.json -c config.json -r results.json 
+```
+
+To post to a server:
+
+
+``` python
+python main.py -s test_src.rkt -a test_assign.json -c config.json -r results.json -u https://feedbot.dbp.io 
+```
 
 ### args
 
-tacking `--src` specifies the file to use as student submission (default `test_src.rkt`)
+tacking `--src` or `-s` specifies the file to use as student submission
 
-tacking `--config` specifies the file to use as problem config (default `config.json`)
+tacking `--assignment` or `-s` specifies the file to use as assignment specification
 
-tacking `--prompt` specifies the file to use as prompt config (default `promptconfigs/system_role.json`)
+tacking `--config` or `-c` specifies the file to use as system & prompt config, defaults to `config.json` in current directory
+
+tacking `--result` or `-r` specifies the file to store output to, and not to print it
+
+tacking `--url` or `-u` specifies the url where results should be sent, in addition to being printed or storing to a local file.
+
+
+tacking `--debug` or `-d` specifies debug more logging than normal
 
 ### gradescope
 
-to run the autograder, zip the entire directory and choose the "upload as zip" option on gradescope.
-
-## info
-
-- setup.sh is the gradescope install script
-- test_src.rkt is the file that the autograder will use if you choose the local option
+TBD
