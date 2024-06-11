@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 from assignmentdata import AssignmentStatement, InvalidSubmission
 from slicesubmission import slice_submission
-from generateprompts import get_comment
+from query import get_comment
 
 
 

@@ -19,22 +19,7 @@ async def make_api_request(model, client, prompt, sysmsg=None):
         model=model,
     )
 
-
-
     return chat_completion.choices[0].message.content
-
-# Checks if code satisfies DR
-async def screen_code(client, typ, code):
-    messages = []
-    messages.append({"role": "system", "content": "Don't make assumptions about what values to plug into functions. Ask for clarification if a user request is ambiguous."})
-    messages.append({"role": "user", "content": "Call the appropriate function with the following student code: \n\n" + code})
-    chat_response = await client.chat.completions.create(
-        model="gpt-4-turbo-preview",
-        messages=messages,
-        tools=tools,
-        tool_choice={"type": "function", "function": {"name": lookup_screening_fun(typ)}}
-    )
-    return json.loads(chat_response.choices[0].message.tool_calls[0].function.arguments)['step']
 
 # Gets a response from OpenAI, given the OpenAI client, a prompt, and code
 # probs is a list of problems to check. If omitted, all problems are tested
