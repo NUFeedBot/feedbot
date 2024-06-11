@@ -10,13 +10,6 @@ from assignmentdata import AssignmentStatement, InvalidSubmission
 from slicesubmission import slice_submission
 from generateprompts import get_comment
 
-# Returns a correct configuration or prints error msg and quits
-# dict -> dict
-def normalize_assignment(config):
-    ret = config.copy()
-    ret.setdefault('assignment', {})
-    ret['assignment'] = AssignmentStatement(ret['assignment'])
-    return ret
 
 
 def process(assignment_path,
@@ -26,16 +19,15 @@ def process(assignment_path,
             results_path):
     logger.info("processing submission {} with assignment {} and config {}".format(submission_path,assignment_path,config_path))
 
-    with open(assignment_path, 'r') as assignment_file, \
-         open("key", 'r') as key,\
+    with open("key", 'r') as key,\
          open(config_path, 'r') as config:
-        assignment = normalize_assignment(json.loads(assignment_file.read()))
         client = AsyncOpenAI(api_key=key.read().rstrip())
         config = json.load(config)
+        assignment = AssignmentStatement.load(assignment_path)
         subdata = slice_submission(submission_path)
-        if not subdata.has_all_problems(range(len(assignment['assignment'].problems))):
+        if not subdata.has_all_problems(range(len(assignment.problems))):
             raise InvalidSubmission("Submission does not have all problems", -1)
-        answer = asyncio.run(get_comment(client, assignment, subdata, None, config))
+        answer = asyncio.run(get_comment(client, assignment, subdata, config))
 
         output = {"score": 1.0}
 

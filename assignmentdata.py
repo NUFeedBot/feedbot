@@ -37,6 +37,13 @@ class ProblemStatement:
             if not isinstance(dep, int): raise InvalidData("Dependencies must be ints")
 
 class AssignmentStatement:
+    @staticmethod
+    def load(path):
+        with open(path,'r') as f:
+            c = json.load(f)
+            c.setdefault('assignment', {})
+            return AssignmentStatement(c['assignment'])
+
     def __init__(self, jsondata):
         if not isinstance(jsondata, dict): raise InvalidData("Top level JSON must be a dict")
         if not json_has(jsondata, "title", str): raise InvalidData("Assignment must have title")
