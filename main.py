@@ -8,8 +8,6 @@ logger = logging.getLogger(__name__)
 
 from submission import Submission
 from assignment import ProblemStatement, AssignmentStatement
-
-from slicesubmission import slice_submission
 from query import get_comment
 
 
