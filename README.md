@@ -56,3 +56,21 @@ tacking `--debug` or `-d` specifies debug more logging than normal
 ### gradescope
 
 TBD
+
+### testing
+
+If you have our `feedbot-data` directory in the same directory where this one is, the following commands will print out results:
+
+Note that hw0 is a bit messed up, since it asks for students to do things before
+they know how to do them correctly, and as a result, the feedback is also hard
+to give.
+
+``` shell
+python main.py -s ../feedbot-data/f1-f23-hw0/bad.rkt -a ../feedbot-data/f1-f23-hw0/template.rkt -j ../feedbot-data/f1-f23-hw0/spec.json -c config.json -p 6
+
+python main.py -s ../feedbot-data/f1-f23-hw1/reference.rkt -a ../feedbot-data/f1-f23-hw1/template.rkt -j ../feedbot-data/f1-f23-hw1/spec.json -c config.json -p 0
+
+python main.py -s ../feedbot-data/f1-f23-hw1/reference.rkt -a ../feedbot-data/f1-f23-hw1/template.rkt -j ../feedbot-data/f1-f23-hw1/spec.json -c config.json -p 1
+```
+
+

@@ -1,6 +1,7 @@
 import json
 import asyncio
 import re
+import tiktoken
 import logging
 logger = logging.getLogger(__name__)
 
@@ -13,6 +14,11 @@ async def make_api_request(model, client, prompt, sysmsg=None):
     messages.append({ "role": "user", "content": prompt })
 
     logger.info(messages)
+
+    tokenizer = tiktoken.encoding_for_model(model)
+    # This is a little inaccurate, since it counts the role stuff, but should be okay
+    ts = tokenizer.encode(str(messages))
+    logger.info(f"TOKENS: {len(ts)}")
 
     chat_completion = await client.chat.completions.create(
         messages=messages,
