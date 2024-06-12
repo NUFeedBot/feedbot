@@ -47,6 +47,7 @@ tacking `--result` or `-r` specifies the file to store output to, and not to pri
 
 tacking `--url` or `-u` specifies the url where results should be sent, in addition to being printed or storing to a local file.
 
+tacking `--problem` or `-p` specifies the (base 0) index of the (single) problem to get feedback on, rather than doing all the problems. Most likely useful during debugging.
 
 tacking `--debug` or `-d` specifies debug more logging than normal
 

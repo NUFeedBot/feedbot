@@ -32,6 +32,7 @@ def send_request(url, code, comments):
 def process(assignment_path,
             submission_path,
             config_path,
+            problem_number,
             post_url,
             results_path):
     logger.info("processing submission {} with assignment {} and config {}".format(submission_path,assignment_path,config_path))
@@ -44,7 +45,7 @@ def process(assignment_path,
         subdata = slice_submission(submission_path)
         if not subdata.has_all_problems(range(len(assignment.problems))):
             raise InvalidSubmission("Submission does not have all problems", -1)
-        answer = asyncio.run(get_comment(client, assignment, subdata, config))
+        answer = asyncio.run(get_comment(client, assignment, subdata, config, problem_number))
 
         output = {"score": 1.0}
 
@@ -78,10 +79,11 @@ if __name__ == "__main__":
         '-u',
         '--url'
     )
-    parser.add_argument('-s', '--submission')
-    parser.add_argument('-a', '--assignment')
-    parser.add_argument('-c', '--config', default="config.json")
+    parser.add_argument('-s', '--submission', required = True)
+    parser.add_argument('-a', '--assignment', required = True)
+    parser.add_argument('-c', '--config', default = "config.json")
     parser.add_argument('-r', '--result')
+    parser.add_argument('-p', '--problem', type=int)
     parser.add_argument('-d', '--debug', action='store_true')
 
     args = parser.parse_args()
@@ -89,4 +91,4 @@ if __name__ == "__main__":
     if args.debug:
         logging.basicConfig(level=logging.INFO)
 
-    process(args.assignment, args.submission, args.config, args.url, args.result)
+    process(args.assignment, args.submission, args.config, args.problem, args.url, args.result)

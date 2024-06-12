@@ -24,10 +24,11 @@ async def make_api_request(model, client, prompt, sysmsg=None):
 # Gets a response from OpenAI, given the OpenAI client, a prompt, and code
 # probs is a list of problems to check. If omitted, all problems are tested
 # (OpenAI, dict, Submission, probs=list[int]) -> list[dict]
-async def get_comment(client, assignment, sub, config, probs=None):
-    if probs is None:
+async def get_comment(client, assignment, sub, config, prob=None):
+    if prob is None:
         probs = range(len(assignment.problems))
-
+    else:
+        probs = [prob]
     return await asyncio.gather(*[get_comment_on_prob(client, assignment, sub, i, config) for i in probs])
 
 # Gets a response from OpenAI for a particular problem number, given the OpenAI client, a prompt, and code
