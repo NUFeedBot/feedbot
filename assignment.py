@@ -1,30 +1,22 @@
 import json
 
-
-COMMENT_STARTER = ";;!"
-PROB_START = f"{COMMENT_STARTER} Begin Problem "
-PROB_END = f"{COMMENT_STARTER} End Problem "
-
 def json_has(jsondata, field, type):
     return field in jsondata and isinstance(jsondata[field], type)
 
 def json_has_or(jsondata, field, type, default):
     return jsondata[field] if json_has(jsondata, field, type) else default
 
-class InvalidData(BaseException):
-    def __init__(self, str):
-        self.str = str
-
-class InvalidSubmission(BaseException):
-    def __init__(self, str, line):
-        self.str = str
-        self.line = line
 
 class ProblemStatement:
     def __init__(self, jsondata):
         if not isinstance(jsondata, dict): raise InvalidData("Problem must be a dict")
-        if not json_has(jsondata, "statement", str): raise InvalidData("Problem must have a statement")
 
+        if not json_has(jsondata, "path", list): raise InvalidData("Problem must have a path")
+        self.path = jsondata["path"]
+        for pathpart in self.path:
+            if not isinstance(pathpart, str): raise InvalidData("Path must be strings")
+
+        if not json_has(jsondata, "statement", str): raise InvalidData("Problem must have a statement")
         self.statement = jsondata["statement"]
         self.title = json_has_or(jsondata, "title", str, "")
         self.stub = json_has_or(jsondata, "stub", str, "")
@@ -53,28 +45,3 @@ class AssignmentStatement:
         self.title = jsondata["title"]
         self.context = json_has_or(jsondata, "context", str, "")
         self.problems = [ProblemStatement(prob) for prob in jsondata["problems"]]
-
-class Submission:
-    def __init__(self, code, secs):
-        # the entire code
-        self.full_code = code
-        # the entire code, split into sections
-        # {prob: int, code: str, linenum: int}
-        # where prob is the problem index or -1 if it's outside of a problem
-        self.all_sections = secs
-    
-    def has_problem(self, no):
-        return any(map(lambda sec: sec['prob'] == no, self.all_sections))
-    
-    def has_all_problems(self, nos):
-        return all(map(self.has_problem, nos))
-    
-    def get_problem(self, no):
-        for sec in self.all_sections:
-            if sec['prob'] == no: return sec
-
-        return "[Problem not found]" # TODO: throw an error?
-    
-
-
-    

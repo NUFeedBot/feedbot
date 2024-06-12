@@ -24,27 +24,26 @@ async def make_api_request(model, client, prompt, sysmsg=None):
 # Gets a response from OpenAI, given the OpenAI client, a prompt, and code
 # probs is a list of problems to check. If omitted, all problems are tested
 # (OpenAI, dict, Submission, probs=list[int]) -> list[dict]
-async def get_comment(client, assignment, sub, config, prob=None):
+async def get_comment(client, assignment, submission, config, prob=None):
     if prob is None:
-        probs = range(len(assignment.problems))
+        probs = assignment.problems
     else:
-        probs = [prob]
-    return await asyncio.gather(*[get_comment_on_prob(client, assignment, sub, i, config) for i in probs])
+        probs = [assignment.problems[prob]]
+    return await asyncio.gather(*[get_comment_on_prob(client, assignment, submission, p, config) for p in probs])
 
 # Gets a response from OpenAI for a particular problem number, given the OpenAI client, a prompt, and code
-# (OpenAI, dict, Submission, int) -> dict
-async def get_comment_on_prob(client, assignment, sub, problem_no, config):
-    statement = get_problem(assignment, problem_no)
-    prob = get_problem_code(sub, problem_no)
+# (OpenAI, Assignment, Submission, Problem, dict) -> dict
+async def get_comment_on_prob(client, assignment, submission, problem, config):
+    code = submission.at(problem.path).contents()
 
     res = {
-        "prob" : problem_no,
-        "line_number" : prob["linenum"],
+        "path" : problem.path,
+        "line_number" : "0",
         "text" : "none",
-        "code" : prob["code"]
+        "code" : code
     }
 
-    prompt = get_prompt_using_config(statement, prob["code"], assignment, config)
+    prompt = get_prompt_using_config(problem, code, assignment, config)
     res["text"] = await make_api_request(config["model"], client, prompt, config["system"])
     res["text"] = redact_codeblocks(res["text"])
 
@@ -57,16 +56,6 @@ def redact_codeblocks(text):
     codeblock_pattern = r'```(?:.*)\n([\s\S]*?)```'
     redacted_text = re.sub(codeblock_pattern, "[CODE REDACTED]", text)
     return redacted_text
-
-# Gets the problem statement for the given problem_no in the config
-# (dict, int) -> ProblemStatement
-def get_problem(assignment, problem_no):
-    return assignment.problems[problem_no]
-
-# Gets the student's code for the given problem
-# (Submission, int) -> str
-def get_problem_code(code, problem_no):
-    return code.get_problem(problem_no)
 
 # Generates a prompt from the problem, code, and config
 # (ProblemStatement, str, dict, dict) -> str

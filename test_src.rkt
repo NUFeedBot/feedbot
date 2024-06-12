@@ -7,7 +7,7 @@
         #t
         (and (not (member? (first l) (rest l))) (all-unique? (rest l))))))
 
-;;! Begin Problem 1: Data Design
+;;! Problem 1
 
 (define-struct player [name strength endurance])
 ; A Player is a (make-player String PosInt PosInt)
@@ -22,9 +22,7 @@
 ; A Match is a (make-match MatchType [ListOf Player] [ListOf Player])
 ; The type is the type of match, and each list is the list of players on one of the teams
 
-;;! End Problem 1
-
-;;! Begin Problem 2: 
+;;! Problem 2
 
 ; validate-match: Match -> Boolean
 ; Returns true if and only if a match is valid blah blah blah...
@@ -34,9 +32,10 @@
     (and (>= l1 1) (>= l2 1) (<= l1 10) (<= l2 10)
          (all-unique? (map player-name (append (match-team1 m) (match-team2 m)))))))
 
-;;! End Problem 2
+;;! Problem 3
 
-;;! Begin Problem 3: 
+
+;;! Part A
 
 (define (prop-diff m p) 
   (- (foldr + 0 (map p (match-team1 m)))
@@ -46,9 +45,7 @@
 ; The strength difference between two teams...
 (define (strength-diff m) (prop-diff m player-strength))
 
-;;! End Problem 3
-
-;;! Begin Problem 4: 
+;;! Part B
 
 ; A MatchResult is one of:
 ; - "invalid"
@@ -67,10 +64,3 @@
           [else "draw"])))
 
 (define (endurance-diff m) (prop-diff m player-endurance))
-
-
-;;! End Problem 4
-
-
-
-

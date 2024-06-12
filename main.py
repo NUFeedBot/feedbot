@@ -6,8 +6,9 @@ from openai import AsyncOpenAI
 import logging
 logger = logging.getLogger(__name__)
 
+from submission import Submission
+from assignment import ProblemStatement, AssignmentStatement
 
-from assignmentdata import AssignmentStatement, InvalidSubmission
 from slicesubmission import slice_submission
 from query import get_comment
 
@@ -42,10 +43,11 @@ def process(assignment_path,
         client = AsyncOpenAI(api_key=key.read().rstrip())
         config = json.load(config)
         assignment = AssignmentStatement.load(assignment_path)
-        subdata = slice_submission(submission_path)
-        if not subdata.has_all_problems(range(len(assignment.problems))):
-            raise InvalidSubmission("Submission does not have all problems", -1)
-        answer = asyncio.run(get_comment(client, assignment, subdata, config, problem_number))
+        submission = Submission.load(submission_path)
+        #subdata = slice_submission(submission_path)
+        #if not subdata.has_all_problems(range(len(assignment.problems))):
+        #    raise InvalidSubmission("Submission does not have all problems", -1)
+        answer = asyncio.run(get_comment(client, assignment, submission, config, problem_number))
 
         output = {"score": 1.0}
 
@@ -54,7 +56,7 @@ def process(assignment_path,
         else:
             for part in answer:
                 print(f"\n\n=============================\n")
-                print(f"Problem: {part['prob']} ({submission_path}#L{part['line_number']})\n")
+                print(f"{submission_path}: {'=>'.join(part['path'])}\n")
                 print(part['code'])
                 print(f"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
                 print(part['text'])
