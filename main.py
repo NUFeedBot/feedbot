@@ -1,6 +1,7 @@
 import argparse
 import asyncio
 import json
+import requests
 from openai import AsyncOpenAI
 import logging
 logger = logging.getLogger(__name__)
@@ -10,6 +11,22 @@ from assignmentdata import AssignmentStatement, InvalidSubmission
 from slicesubmission import slice_submission
 from query import get_comment
 
+
+# Sends a POST request to the given URL, using the given list of comments
+# (str (URL), List[Comment]) -> Response
+def send_request(url, code, comments):
+    addendum = 'entry'
+
+    request_obj = {
+        'code': code,
+        'comments': json.dumps(
+            {
+                "comments": comments
+            }
+        ),
+    }
+
+    return requests.post(url + "/" + addendum, params=request_obj)
 
 
 def process(assignment_path,
@@ -49,7 +66,7 @@ def process(assignment_path,
             print(post_url + "/submission/" + json.loads(response.text)['msg'][4:])
         if results_path:
             with open(results_path, 'w') as results_file:
-                json.dump(output, results_path)
+                json.dump(output, results_file)
 
 
 if __name__ == "__main__":
