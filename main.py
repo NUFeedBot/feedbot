@@ -53,9 +53,13 @@ def process(assignment_path,
             output["feedback"] = answer
         else:
             for part in answer:
-                print(f"\n\nProb: {part['prob']}")
-                print(f"\nLinenum: {part['line_number']}")
-                print(f"\nResponse: \n\n{part['text']}")
+                print(f"\n\n=============================\n")
+                print(f"Problem: {part['prob']} ({submission_path}#L{part['line_number']})\n")
+                print(part['code'])
+                print(f"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
+                print(part['text'])
+                print(f"\n=============================\n\n")
+
 
         if post_url:
             response = send_request(

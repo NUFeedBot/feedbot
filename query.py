@@ -37,23 +37,16 @@ async def get_comment_on_prob(client, assignment, sub, problem_no, config):
     statement = get_problem(assignment, problem_no)
     prob = get_problem_code(sub, problem_no)
 
-    if False and "FD" in statement.tags:
-        screened = await screen_code(client, "function", prob["code"])
-        res = {
-            "prob": problem_no,
-            "line_number": prob["linenum"],
-            "text": screened
-        }
-    else:
-        res = {
-            "prob": problem_no,
-            "line_number": prob["linenum"],
-            "text": "none"
-        }
+    res = {
+        "prob" : problem_no,
+        "line_number" : prob["linenum"],
+        "text" : "none",
+        "code" : prob["code"]
+    }
 
-        prompt = get_prompt_using_config(statement, prob["code"], assignment, config)
-        res["text"] = await make_api_request(config["model"], client, prompt, config["system"])
-        res["text"] = redact_codeblocks(res["text"])
+    prompt = get_prompt_using_config(statement, prob["code"], assignment, config)
+    res["text"] = await make_api_request(config["model"], client, prompt, config["system"])
+    res["text"] = redact_codeblocks(res["text"])
 
     return res
 
