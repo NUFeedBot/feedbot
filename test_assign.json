@@ -1,7 +1,6 @@
 {
     "assignment": {
         "title": "Example Assignment 1",
-        "lang": "#lang htdp/isl+",
         "problems": [
             {
                 "path" : ["Problem 1"],
