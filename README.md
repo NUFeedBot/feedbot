@@ -19,27 +19,29 @@ pip install -r requirements.txt
 To run locally, printing to stdout:
 
 ``` python
-python main.py -d -s test_src.rkt -a test_assign.json -c config.json 
+python main.py -d -s test_src.rkt -j test_assign.json -a test_assign.rkt -c config.json 
 ```
 
 To run locally, printing to `results.json`
 
 ``` python
-python main.py -s test_src.rkt -a test_assign.json -c config.json -r results.json 
+python main.py -s test_src.rkt -j test_assign.json -a test_assign.rkt -c config.json -r results.json 
 ```
 
 To post to a server:
 
 
 ``` python
-python main.py -s test_src.rkt -a test_assign.json -c config.json -r results.json -u https://feedbot.dbp.io 
+python main.py -s test_src.rkt -j test_assign.json -a test_assign.rkt -c config.json -r results.json -u https://feedbot.dbp.io 
 ```
 
 ### args
 
 tacking `--src` or `-s` specifies the file to use as student submission
 
-tacking `--assignment` or `-s` specifies the file to use as assignment specification
+tacking `--spec` or `-j` specifies the file to use as assignment specification (a json file with metadata about how to give feedback on problems)
+
+tacking `--assignment` or `-a` specifies the file to use for the assignment problems (must correspond to metadata provided with `-j`)
 
 tacking `--config` or `-c` specifies the file to use as system & prompt config, defaults to `config.json` in current directory
 

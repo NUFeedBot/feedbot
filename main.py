@@ -28,19 +28,20 @@ def send_request(url, code, comments):
     return requests.post(url + "/" + addendum, params=request_obj)
 
 
-def process(assignment_path,
+def process(assignment_spec_path,
+            assignment_template_path,
             submission_path,
             config_path,
             problem_number,
             post_url,
             results_path):
-    logger.info("processing submission {} with assignment {} and config {}".format(submission_path,assignment_path,config_path))
+    logger.info("processing submission {} with assignment {} and config {}".format(submission_path,assignment_template_path,config_path))
 
     with open("key", 'r') as key,\
          open(config_path, 'r') as config:
         client = AsyncOpenAI(api_key=key.read().rstrip())
         config = json.load(config)
-        assignment = AssignmentStatement.load(assignment_path)
+        assignment = AssignmentStatement.load(assignment_spec_path, assignment_template_path)
         submission = Submission.load(submission_path)
         #subdata = slice_submission(submission_path)
         #if not subdata.has_all_problems(range(len(assignment.problems))):
@@ -85,6 +86,7 @@ if __name__ == "__main__":
     )
     parser.add_argument('-s', '--submission', required = True)
     parser.add_argument('-a', '--assignment', required = True)
+    parser.add_argument('-j', '--spec', required = True)
     parser.add_argument('-c', '--config', default = "config.json")
     parser.add_argument('-r', '--result')
     parser.add_argument('-p', '--problem', type=int)
@@ -95,4 +97,4 @@ if __name__ == "__main__":
     if args.debug:
         logging.basicConfig(level=logging.INFO)
 
-    process(args.assignment, args.submission, args.config, args.problem, args.url, args.result)
+    process(args.spec, args.assignment, args.submission, args.config, args.problem, args.url, args.result)
