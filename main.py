@@ -65,7 +65,7 @@ def process(assignment_spec_path,
         if post_url:
             response = send_request(
                 post_url,
-                subdata.full_code,
+                submission.contents(),
                 answer
             )
             output["tests"] = [{"output" : response.text}]
