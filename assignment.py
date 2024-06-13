@@ -30,8 +30,10 @@ class ProblemStatement:
         for tag in self.tags:
             if not isinstance(tag, str): raise InvalidData("Tags must be strings")
         for dep in self.dependencies:
-            if not isinstance(dep, int): raise InvalidData("Dependencies must be ints")
-
+            if not isinstance(dep, list): raise InvalidData("Dependencies must be strings")
+            
+            for path_section in dep:
+                if not isinstance(path_section, str): raise InvalidData("Dependency path must consist of strings")
 class AssignmentStatement:
     @staticmethod
     def load(spec_path, template_path):

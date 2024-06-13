@@ -41,6 +41,7 @@ async def get_comment(client, assignment, submission, config, prob=None):
 # (OpenAI, Assignment, Submission, Problem, dict) -> dict
 async def get_comment_on_prob(client, assignment, submission, problem, config):
     code = submission.at(problem.path).contents()
+    dependencies_code = submission.extract_responses(problem.dependencies)
 
     res = {
         "path" : problem.path,
@@ -49,7 +50,7 @@ async def get_comment_on_prob(client, assignment, submission, problem, config):
         "code" : code
     }
 
-    prompt = get_prompt_using_config(problem, code, assignment, config)
+    prompt = get_prompt_using_config(problem, code, assignment, config, dependencies_code)
     res["text"] = await make_api_request(config["model"], client, prompt, config["system"])
     res["text"] = redact_codeblocks(res["text"])
 
@@ -63,11 +64,15 @@ def redact_codeblocks(text):
     redacted_text = re.sub(codeblock_pattern, "[CODE REDACTED]", text)
     return redacted_text
 
-# Generates a prompt from the problem, code, and config
-# (ProblemStatement, str, dict, dict) -> str
-def get_prompt_using_config(problem, code, assignment, config):
+# Generates a prompt from the problem, code, config, and dependencies
+# (ProblemStatement, str, dict, dict, str) -> str
+def get_prompt_using_config(problem, code, assignment, config, dep_code):
     has_grading_note = (problem.grading_note != "")
     grading_pretext = "\nThis specific problem has another additional grading note:\n" if has_grading_note else ""
+
+    has_dependencies = (dep_code != "")
+    dependencies_pretext = "\n This problem relies on the following student responses for some previous questions: \n" \
+    if has_dependencies else ""
 
     return get_prompt_for("general", problem, config) \
         + get_prompt_for("pre_context", problem, config) \
@@ -76,11 +81,14 @@ def get_prompt_using_config(problem, code, assignment, config):
         + get_prompt_for("pre_statement", problem, config) \
         + problem.statement \
         + get_prompt_for("post_statement", problem, config) \
+        + dependencies_pretext \
+        + dep_code \
         + grading_pretext \
         + problem.grading_note \
         + get_prompt_for("pre_code", problem, config) \
         + code \
         + get_prompt_for("post_code", problem, config)
+        #+ problem.
 
 # Gets the prompt info for a certain config attribute name
 # names followed by #TAG will also be included if the problem has that tag

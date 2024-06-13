@@ -43,3 +43,13 @@ class Submission:
             return self.before(MARKER)
         else:
             return self.after(MARKER + " " + path[0]).at(path[1:])
+        
+    def extract_responses(self, problem_paths):
+        dependencies = ""
+
+        for path in problem_paths:
+            path_str = ",".join(path)
+            dependencies += f"Student response for {path_str}: \n" + self.at(path).contents()
+        
+        
+        return dependencies

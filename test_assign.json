@@ -15,7 +15,9 @@
                     "Problem 2"
                 ],
                 "dependencies": [
-                    0
+                    [
+                        "Problem 1"
+                    ]
                 ],
                 "tags": [
                     "FD"
@@ -25,9 +27,6 @@
                 "path": [
                     "Problem 3",
                     "Part A"
-                ],
-                "dependencies": [
-                    0
                 ],
                 "tags": [
                     "LA",
@@ -39,11 +38,6 @@
                 "path": [
                     "Problem 3",
                     "Part B"
-                ],
-                "dependencies": [
-                    0,
-                    1,
-                    2
                 ],
                 "tags": [
                     "FD"
