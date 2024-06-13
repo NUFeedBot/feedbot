@@ -71,6 +71,9 @@ python main.py -s ../feedbot-data/f1-f23-hw0/bad.rkt -a ../feedbot-data/f1-f23-h
 python main.py -s ../feedbot-data/f1-f23-hw1/reference.rkt -a ../feedbot-data/f1-f23-hw1/template.rkt -j ../feedbot-data/f1-f23-hw1/spec.json -c config.json -p 0
 
 python main.py -s ../feedbot-data/f1-f23-hw1/reference.rkt -a ../feedbot-data/f1-f23-hw1/template.rkt -j ../feedbot-data/f1-f23-hw1/spec.json -c config.json -p 1
+
+# This relies upon dependencies, otherwise it can complain about Planet being undefined:
+python main.py -s ../feedbot-data/f1-f23-hw1/reference.rkt -a ../feedbot-data/f1-f23-hw1/template.rkt -j ../feedbot-data/f1-f23-hw1/spec.json -c config.json -p 3
 ```
 
 
