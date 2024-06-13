@@ -48,7 +48,7 @@ def process(assignment_spec_path,
         #    raise InvalidSubmission("Submission does not have all problems", -1)
         answer = asyncio.run(get_comment(client, assignment, submission, config, problem_number))
 
-        output = {"score": 1.0}
+        output = {"score": 0.0}
 
         if results_path:
             output["feedback"] = answer

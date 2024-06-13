@@ -3,24 +3,51 @@
         "title": "Example Assignment 1",
         "problems": [
             {
-                "path" : ["Problem 1"],
-                "tags": ["DD"]
+                "path": [
+                    "Problem 1"
+                ],
+                "tags": [
+                    "DD"
+                ]
             },
             {
-                "path" : ["Problem 2"],
-                "dependencies": [0],
-                "tags": ["FD"]
-
+                "path": [
+                    "Problem 2"
+                ],
+                "dependencies": [
+                    0
+                ],
+                "tags": [
+                    "FD"
+                ]
             },
             {
-                "path" : ["Problem 3", "Part A"],
-                "dependencies": [0],
-                "tags": ["LA", "FD"]
+                "path": [
+                    "Problem 3",
+                    "Part A"
+                ],
+                "dependencies": [
+                    0
+                ],
+                "tags": [
+                    "LA",
+                    "FD"
+                ],
+                "grading_note": "For this problem, absolutely ensure to begin your response with \" You have made a good attempt at solving this problem.\""
             },
             {
-                "path" : ["Problem 3", "Part B"],
-                "dependencies": [0,1,2],
-                "tags": ["FD"]
+                "path": [
+                    "Problem 3",
+                    "Part B"
+                ],
+                "dependencies": [
+                    0,
+                    1,
+                    2
+                ],
+                "tags": [
+                    "FD"
+                ]
             }
         ]
     }

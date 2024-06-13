@@ -66,6 +66,9 @@ def redact_codeblocks(text):
 # Generates a prompt from the problem, code, and config
 # (ProblemStatement, str, dict, dict) -> str
 def get_prompt_using_config(problem, code, assignment, config):
+    has_grading_note = (problem.grading_note != "")
+    grading_pretext = "\nThis specific problem has another additional grading note:\n" if has_grading_note else ""
+
     return get_prompt_for("general", problem, config) \
         + get_prompt_for("pre_context", problem, config) \
         + assignment.context \
@@ -73,6 +76,8 @@ def get_prompt_using_config(problem, code, assignment, config):
         + get_prompt_for("pre_statement", problem, config) \
         + problem.statement \
         + get_prompt_for("post_statement", problem, config) \
+        + grading_pretext \
+        + problem.grading_note \
         + get_prompt_for("pre_code", problem, config) \
         + code \
         + get_prompt_for("post_code", problem, config)

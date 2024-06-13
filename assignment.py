@@ -25,6 +25,7 @@ class ProblemStatement:
         self.stub = json_has_or(jsondata, "stub", str, "")
         self.tags = json_has_or(jsondata, "tags", list, [])
         self.dependencies = json_has_or(jsondata, "dependencies", list, [])
+        self.grading_note = json_has_or(jsondata, "grading_note", str, "")
 
         for tag in self.tags:
             if not isinstance(tag, str): raise InvalidData("Tags must be strings")
