@@ -7,18 +7,21 @@ logger = logging.getLogger(__name__)
 
 # Makes an API request with the given string prompt
 # (OpenAI, str, str) -> str
-async def make_api_request(model, client, prompt, sysmsg=None):
+async def make_api_request(model, client, prompt, prob_path, sysmsg=None):
     messages=[]
     if sysmsg is not None:
         messages.append({ "role": "system", "content": sysmsg })
     messages.append({ "role": "user", "content": prompt })
 
-    logger.info(messages)
+
+
+    logger.info(f"\n{prob_path}\n=================================================================================================\nUser: \n\{prompt}\n")
 
     tokenizer = tiktoken.encoding_for_model(model)
+
     # This is a little inaccurate, since it counts the role stuff, but should be okay
     ts = tokenizer.encode(str(messages))
-    logger.info(f"TOKENS: {len(ts)}")
+    logger.info(f"\n--------------------------------------------\nTOKENS: {len(ts)}\n--------------------------------------------\n=================================================================================================\n\n\n")
 
     chat_completion = await client.chat.completions.create(
         messages=messages,
@@ -31,6 +34,8 @@ async def make_api_request(model, client, prompt, sysmsg=None):
 # probs is a list of problems to check. If omitted, all problems are tested
 # (OpenAI, dict, Submission, probs=list[int]) -> list[dict]
 async def get_comment(client, assignment, submission, config, prob=None):
+    config_msg = config["system"]
+    logger.info(f"\nCommon system message:\n--------------------------------------------\n{config_msg}\n--------------------------------------------\n")
     if prob is None:
         probs = assignment.problems
     else:
@@ -51,7 +56,7 @@ async def get_comment_on_prob(client, assignment, submission, problem, config):
     }
 
     prompt = get_prompt_using_config(problem, code, assignment, config, dependencies_code)
-    res["text"] = await make_api_request(config["model"], client, prompt, config["system"])
+    res["text"] = await make_api_request(config["model"], client, prompt, "=>".join(problem.path), config["system"])
     res["text"] = redact_codeblocks(res["text"])
 
     return res

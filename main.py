@@ -35,7 +35,7 @@ def process(assignment_spec_path,
             problem_number,
             post_url,
             results_path):
-    logger.info("processing submission {} with assignment {} and config {}".format(submission_path,assignment_template_path,config_path))
+    logger.info("\n\nprocessing submission {} with assignment {} and config {}\n".format(submission_path,assignment_template_path,config_path))
 
     with open("key", 'r') as key,\
          open(config_path, 'r') as config:
@@ -53,6 +53,7 @@ def process(assignment_spec_path,
         if results_path:
             output["feedback"] = answer
         else:
+            print("\n\n\n\nModel Output:")
             for part in answer:
                 print(f"\n\n=============================\n")
                 print(f"{submission_path}: {'=>'.join(part['path'])}\n")
