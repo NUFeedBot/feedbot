@@ -2,11 +2,11 @@ from typing import List
 
 MARKER = ";;!"
 
-
-class Submission:
+# Represents an rkt file/txt file that is either a student submitted file, or assignment file
+class SubmissionTemplate:
     @staticmethod
     def load(path):
-        return Submission([l.rstrip("\n") for l in open(path).readlines()])
+        return SubmissionTemplate([l.rstrip("\n") for l in open(path).readlines()])
 
     def __init__(self, lines: List[str]):
         self.lines = lines
@@ -17,8 +17,8 @@ class Submission:
         """
         for i, line in enumerate(self.lines):
             if line.startswith(marker):
-                return Submission(self.lines[i + 1 :])
-        return Submission([])
+                return SubmissionTemplate(self.lines[i + 1 :])
+        return SubmissionTemplate([])
 
     def before(self, marker: str):
         """
@@ -26,8 +26,8 @@ class Submission:
         """
         for i, line in enumerate(self.lines):
             if line.startswith(marker):
-                return Submission(self.lines[:i])
-        return Submission(self.lines)
+                return SubmissionTemplate(self.lines[:i])
+        return SubmissionTemplate(self.lines)
 
     def contents(self):
         """

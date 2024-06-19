@@ -6,7 +6,7 @@ from openai import AsyncOpenAI
 import logging
 logger = logging.getLogger(__name__)
 
-from submission import Submission
+from submission import SubmissionTemplate
 from assignment import ProblemStatement, AssignmentStatement
 from query import get_comment
 
@@ -42,12 +42,13 @@ def process(assignment_spec_path,
         client = AsyncOpenAI(api_key=key.read().rstrip())
         config = json.load(config)
         assignment = AssignmentStatement.load(assignment_spec_path, assignment_template_path)
-        submission = Submission.load(submission_path)
+        submission = SubmissionTemplate.load(submission_path)
         #subdata = slice_submission(submission_path)
         #if not subdata.has_all_problems(range(len(assignment.problems))):
         #    raise InvalidSubmission("Submission does not have all problems", -1)
         answer = asyncio.run(get_comment(client, assignment, submission, config, problem_number))
 
+        #Default score of 0, needed for gradescope scoring
         output = {"score": 0.0}
 
         if results_path:

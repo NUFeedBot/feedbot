@@ -6,7 +6,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 # Makes an API request with the given string prompt
-# (OpenAI, str, str) -> str
+# (OpenAI, str, str, str, str) -> str
 async def make_api_request(model, client, prompt, prob_path, sysmsg=None):
     messages=[]
     if sysmsg is not None:
@@ -30,9 +30,10 @@ async def make_api_request(model, client, prompt, prob_path, sysmsg=None):
 
     return chat_completion.choices[0].message.content
 
-# Gets a response from OpenAI, given the OpenAI client, a prompt, and code
-# probs is a list of problems to check. If omitted, all problems are tested
-# (OpenAI, dict, Submission, probs=list[int]) -> list[dict]
+# Gets a response from OpenAI, given the OpenAI client, the assignment, student submission, 
+# and config. probs is an int index of a problem to check. 
+# If omitted, all problems are tested.
+# (OpenAI, dict, SubmissionTemplate, dict, probs=int) -> list[dict]
 async def get_comment(client, assignment, submission, config, prob=None):
     config_msg = config["system"]
     logger.info(f"\nCommon system message:\n--------------------------------------------\n{config_msg}\n--------------------------------------------\n")
@@ -42,8 +43,9 @@ async def get_comment(client, assignment, submission, config, prob=None):
         probs = [assignment.problems[prob]]
     return await asyncio.gather(*[get_comment_on_prob(client, assignment, submission, p, config) for p in probs])
 
-# Gets a response from OpenAI for a particular problem number, given the OpenAI client, a prompt, and code
-# (OpenAI, Assignment, Submission, Problem, dict) -> dict
+# Gets a response from OpenAI for a particular problem number, 
+# given the OpenAI client, asignment, student submission, the problem, and config 
+# (OpenAI, Assignment, SubmissionTemplate, ProblemStatement, dict) -> dict
 async def get_comment_on_prob(client, assignment, submission, problem, config):
     code = submission.at(problem.path).contents()
     dependencies_code = submission.extract_responses(problem.dependencies)
