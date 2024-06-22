@@ -46,6 +46,7 @@ def process(assignment_spec_path,
         #subdata = slice_submission(submission_path)
         #if not subdata.has_all_problems(range(len(assignment.problems))):
         #    raise InvalidSubmission("Submission does not have all problems", -1)
+
         answer = asyncio.run(get_comment(client, assignment, submission, config, problem_number))
 
         #Default score of 0, needed for gradescope scoring

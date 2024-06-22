@@ -4,6 +4,7 @@ import re
 import tiktoken
 import logging
 logger = logging.getLogger(__name__)
+from validate import validateSubmissionProb
 
 # Makes an API request with the given string prompt
 # (OpenAI, str, str, str, str) -> str
@@ -47,6 +48,7 @@ async def get_comment(client, assignment, submission, config, prob=None):
 # given the OpenAI client, asignment, student submission, the problem, and config 
 # (OpenAI, Assignment, SubmissionTemplate, ProblemStatement, dict) -> dict
 async def get_comment_on_prob(client, assignment, submission, problem, config):
+    validateSubmissionProb(problem.path, submission)
     code = submission.at(problem.path).contents()
     dependencies_code = submission.extract_responses(problem.dependencies)
 

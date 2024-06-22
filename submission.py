@@ -2,7 +2,7 @@ from typing import List
 
 MARKER = ";;!"
 
-# Represents an rkt file/txt file that is either a student submitted file, or assignment file
+# Represents an rkt file/txt file that is either a student submitted file, assignment file, or a specific assignment problem
 class SubmissionTemplate:
     @staticmethod
     def load(path):
@@ -14,6 +14,7 @@ class SubmissionTemplate:
     def after(self, marker: str):
         """
         Returns the contents of this submission after a line starting with the marker
+        
         """
         for i, line in enumerate(self.lines):
             if line.startswith(marker):
@@ -23,6 +24,7 @@ class SubmissionTemplate:
     def before(self, marker: str):
         """
         Returns the contents of this submission before the marker
+
         """
         for i, line in enumerate(self.lines):
             if line.startswith(marker):
@@ -32,19 +34,26 @@ class SubmissionTemplate:
     def contents(self):
         """
         Returns the contents as a single string
+
         """
         return "\n".join(self.lines)
 
     def at(self, path):
         """
         Returns the contents indexed by the given path of marker strings
+
         """
         if path == []:
             return self.before(MARKER)
         else:
             return self.after(MARKER + " " + path[0]).at(path[1:])
-        
+    
+
     def extract_responses(self, problem_paths):
+        """
+        Given problem paths, extracts all student responses for these problem paths (to be used as dependencies)
+        
+        """
         dependencies = ""
 
         for path in problem_paths:
@@ -53,3 +62,10 @@ class SubmissionTemplate:
         
         
         return dependencies
+    
+    def has_data(self):
+        """
+        Returns if this submission template has any lines
+        
+        """
+        return (self.lines != [])
