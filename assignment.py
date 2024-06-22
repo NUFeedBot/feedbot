@@ -1,6 +1,7 @@
 import json
 
 from submission import SubmissionTemplate
+from validate import validate, validateJson, validateResponse, validateProb
 
 #Returns if given json has the given field and if the data is of given type
 def json_has(jsondata, field, type):
@@ -13,22 +14,19 @@ def json_has_or(jsondata, field, type, default):
 
 #Represents a single problem in an assignment along with its metadata
 class ProblemStatement:
-    def __init__(self, jsondata, template):
-        if not isinstance(jsondata, dict): raise InvalidData("Problem must be a dict")
+    def __init__(self, prob_data, template):
+        validateProb(prob_data)
 
-        if not json_has(jsondata, "path", list): raise InvalidData("Problem must have a path")
-        self.path = jsondata["path"]
-        for pathpart in self.path:
-            if not isinstance(pathpart, str): raise InvalidData("Path must be strings")
-
+        self.path = prob_data["path"]
         statement = template.at(self.path)
+
         if statement == []: raise InvalidData(f"Problem statement {self.path} must exist in template")
         self.statement = statement.contents()
-        self.title = json_has_or(jsondata, "title", str, "")
-        self.stub = json_has_or(jsondata, "stub", str, "")
-        self.tags = json_has_or(jsondata, "tags", list, [])
-        self.dependencies = json_has_or(jsondata, "dependencies", list, [])
-        self.grading_note = json_has_or(jsondata, "grading_note", str, "")
+        self.title = json_has_or(prob_data, "title", str, "")
+        self.stub = json_has_or(prob_data, "stub", str, "")
+        self.tags = json_has_or(prob_data, "tags", list, [])
+        self.dependencies = json_has_or(prob_data, "dependencies", list, [])
+        self.grading_note = json_has_or(prob_data, "grading_note", str, "")
 
         for tag in self.tags:
             if not isinstance(tag, str): raise InvalidData("Tags must be strings")
@@ -49,10 +47,9 @@ class AssignmentStatement:
             return AssignmentStatement(c['assignment'], template)
 
     def __init__(self, jsondata, template):
-        if not isinstance(jsondata, dict): raise InvalidData("Top level JSON must be a dict")
-        if not json_has(jsondata, "title", str): raise InvalidData("Assignment must have title")
-        if not json_has(jsondata, "problems", list): raise InvalidData("Assignment must have problems")
 
+        validateJson(jsondata)
+        
         self.title = jsondata["title"]
         self.context = json_has_or(jsondata, "context", str, "")
         self.problems = [ProblemStatement(prob, template) for prob in jsondata["problems"]]
