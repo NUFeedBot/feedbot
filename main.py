@@ -12,16 +12,17 @@ from query import get_comment
 
 
 # Sends a POST request to the given URL, using the given list of comments
-# (str (URL), List[Comment]) -> Response
-def send_request(url, comments):
+# (str (URL), List[Comment], str (Email)) -> Response
+def send_request(url, comments, submitter_email):
     addendum = 'entry'
 
     request_obj = {
         'comments': json.dumps(
             {
                 "comments": comments
-            }
+            },
         ),
+        'email': submitter_email
     }
 
     return requests.post(url + "/" + addendum, params=request_obj)
@@ -33,7 +34,8 @@ def process(assignment_spec_path,
             config_path,
             problem_number,
             post_url,
-            results_path):
+            results_path,
+            submitter_email):
     logger.info("\n\nprocessing submission {} with assignment {} and config {}\n".format(submission_path,assignment_template_path,config_path))
 
     with open("key", 'r') as key,\
@@ -67,7 +69,8 @@ def process(assignment_spec_path,
         if post_url:
             response = send_request(
                 post_url,
-                answer
+                answer,
+                submitter_email
             )
             output["tests"] = [{"output" : response.text}]
             print(post_url + "/submission/" + json.loads(response.text)['msg'][4:])
@@ -92,10 +95,11 @@ if __name__ == "__main__":
     parser.add_argument('-r', '--result')
     parser.add_argument('-p', '--problem', type=int)
     parser.add_argument('-d', '--debug', action='store_true')
+    parser.add_argument('-e', '--email', default = "")
 
     args = parser.parse_args()
 
     if args.debug:
         logging.basicConfig(level=logging.INFO)
 
-    process(args.spec, args.assignment, args.submission, args.config, args.problem, args.url, args.result)
+    process(args.spec, args.assignment, args.submission, args.config, args.problem, args.url, args.result, args.email)

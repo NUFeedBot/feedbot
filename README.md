@@ -53,6 +53,10 @@ tacking `--problem` or `-p` specifies the (base 0) index of the (single) problem
 
 tacking `--debug` or `-d` specifies debug more logging than normal
 
+
+tacking `--email` or `-e` specifies the email address of the submitter (student)
+
+
 ### gradescope
 
 TBD
