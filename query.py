@@ -53,8 +53,7 @@ async def get_comment_on_prob(client, assignment, submission, problem, config):
     dependencies_code = submission.extract_responses(problem.dependencies)
 
     res = {
-        "path" : problem.path,
-        "line_number" : "0",
+        "path" : ", ".join(problem.path),
         "text" : "none",
         "code" : code
     }

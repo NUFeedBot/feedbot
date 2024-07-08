@@ -13,11 +13,10 @@ from query import get_comment
 
 # Sends a POST request to the given URL, using the given list of comments
 # (str (URL), List[Comment]) -> Response
-def send_request(url, code, comments):
+def send_request(url, comments):
     addendum = 'entry'
 
     request_obj = {
-        'code': code,
         'comments': json.dumps(
             {
                 "comments": comments
@@ -68,7 +67,6 @@ def process(assignment_spec_path,
         if post_url:
             response = send_request(
                 post_url,
-                submission.contents(),
                 answer
             )
             output["tests"] = [{"output" : response.text}]
