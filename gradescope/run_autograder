@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# At some point, this should probably turn into a proper script, to incorporate
+# rate limiting, etc.
+
+cd source
+python3 main.py -s `ls /autograder/submission/*.rkt | head -n1` -a template.rkt -j spec.json -c config.json -u https://feedbot.dbp.io -e `cat /autograder/submission_metadata.json | jq ".users | .[0] | .email"` -r /autograder/results/results.json

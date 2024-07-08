@@ -53,9 +53,7 @@ def process(assignment_spec_path,
         #Default score of 0, needed for gradescope scoring
         output = {"score": 0.0}
 
-        if results_path:
-            output["feedback"] = answer
-        else:
+        if not results_path:
             print("\n\n\n\nModel Output:")
             for part in answer:
                 print(f"\n\n=============================\n")
@@ -72,8 +70,10 @@ def process(assignment_spec_path,
                 answer,
                 submitter_email
             )
-            output["tests"] = [{"output" : response.text}]
-            print(post_url + "/submission/" + json.loads(response.text)['msg'][4:])
+            url = post_url + "/submission/" + json.loads(response.text)['msg'][4:]
+            output["output"] = f"Feedbot automated feedback available at [{url}]({url})."
+
+            print(url)
         if results_path:
             with open(results_path, 'w') as results_file:
                 json.dump(output, results_file)

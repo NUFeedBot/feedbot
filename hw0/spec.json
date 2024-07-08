@@ -1,0 +1,35 @@
+{
+    "assignment": {
+        "title": "2023 F1 HW0",
+        "problems": [
+            {
+                "path" : ["Problem 1", "Part A"],
+                "tags": ["US"]
+            },
+            {
+                "path" : ["Problem 1", "Part B"],
+                "tags": ["US"]
+            },
+            {
+                "path" : ["Problem 1", "Part C"],
+                   "tags": ["US"]
+            },
+            {
+                "path" : ["Problem 2", "Part A"],
+                "tags": ["US"]
+            },
+            {
+                "path" : ["Problem 2", "Part B"],
+                "tags": ["US"]
+            },
+            {
+                "path" : ["Problem 2", "Part C"],
+                "tags": ["US"]
+            },
+            {
+                "path" : ["Problem 2", "Part D"],
+                "tags": ["US"]
+            }
+        ]
+    }
+}
