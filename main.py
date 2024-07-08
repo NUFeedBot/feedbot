@@ -72,6 +72,7 @@ def process(assignment_spec_path,
             )
             url = post_url + "/submission/" + json.loads(response.text)['msg'][4:]
             output["output"] = f"Feedbot automated feedback available at [{url}]({url})."
+            output["output_format"] = "md"
 
             print(url)
         if results_path:
