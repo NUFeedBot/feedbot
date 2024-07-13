@@ -57,7 +57,8 @@ def process(assignment_spec_path,
             print("\n\n\n\nModel Output:")
             for part in answer:
                 print(f"\n\n=============================\n")
-                print(f"{submission_path}: {'=>'.join(part['path'])}\n")
+                path = part['path'].split(", ")
+                print(f"{submission_path}: {'=>'.join(path)}\n")
                 print(part['code'])
                 print(f"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
                 print(part['text'])
