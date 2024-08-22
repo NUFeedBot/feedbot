@@ -13,7 +13,7 @@ from query import get_comment
 
 # Sends a POST request to the given URL, using the given list of comments
 # (str (URL), List[Comment], str (Email)) -> Response
-def send_request(url, comments, submitter_email):
+def send_request(url, key, comments, submitter_email):
     addendum = 'entry'
 
     request_obj = {
@@ -22,7 +22,8 @@ def send_request(url, comments, submitter_email):
                 "comments": comments
             },
         ),
-        'email': submitter_email
+        'email': submitter_email,
+        'key': key
     }
 
     return requests.post(url + "/" + addendum, params=request_obj)
@@ -35,7 +36,8 @@ def process(assignment_spec_path,
             problem_number,
             post_url,
             results_path,
-            submitter_email):
+            submitter_email,
+            post_key):
     logger.info("\n\nprocessing submission {} with assignment {} and config {}\n".format(submission_path,assignment_template_path,config_path))
 
     with open("key", 'r') as key,\
@@ -68,6 +70,7 @@ def process(assignment_spec_path,
         if post_url:
             response = send_request(
                 post_url,
+                post_key,
                 answer,
                 submitter_email
             )
@@ -86,10 +89,7 @@ if __name__ == "__main__":
         prog='FeedBot autograder'
     )
 
-    parser.add_argument(
-        '-u',
-        '--url'
-    )
+    parser.add_argument('-u', '--url')
     parser.add_argument('-s', '--submission', required = True)
     parser.add_argument('-a', '--assignment', required = True)
     parser.add_argument('-j', '--spec', required = True)
@@ -98,10 +98,11 @@ if __name__ == "__main__":
     parser.add_argument('-p', '--problem', type=int)
     parser.add_argument('-d', '--debug', action='store_true')
     parser.add_argument('-e', '--email', default = "")
+    parser.add_argument('-k', '--key', default = "")
 
     args = parser.parse_args()
 
     if args.debug:
         logging.basicConfig(level=logging.INFO)
 
-    process(args.spec, args.assignment, args.submission, args.config, args.problem, args.url, args.result, args.email)
+    process(args.spec, args.assignment, args.submission, args.config, args.problem, args.url, args.result, args.email, args.key)
