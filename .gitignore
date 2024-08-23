@@ -1,4 +1,5 @@
 key
+.env
 .venv
 __pycache__
 results.json

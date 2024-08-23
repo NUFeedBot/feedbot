@@ -2,9 +2,21 @@
 
 ## setup
 
-in order to generate comments, you'll need to make an OpenAI API key and put it in a file named `key` in the root of the project directory. `key` is already gitignored.
+in order to generate comments, you'll need to make an OpenAI API key and create a `.env` file with the following:
 
-you'll also need to install the requests and openai python packages.
+```
+OPENAI_KEY=sk-...
+```
+
+You _optionally_ can also include:
+
+```
+FEEDBOT_KEY=...
+```
+
+Which is a pre-shared key that will be sent with requests to the feedbot web server. Requests are always authenticated, but this key can instead be passed with the `--key` argument. If both exist, the command line argument will override the environmen variable.
+
+You'll also need to install the requests and openai python packages.
 
 Easiest is to set up a virtual environment with:
 
@@ -49,7 +61,7 @@ tacking `--result` or `-r` specifies the file to store output to, and not to pri
 
 tacking `--url` or `-u` specifies the url where results should be sent, in addition to being printed or storing to a local file.
 
-tacking `--key` or `-k` specifies the key that should be used when sending the request. Note that using `--url` with `--key` likely will not work, as the server requires (pre-shared-key) authentication.
+tacking `--key` or `-k` specifies the key that should be used when sending the request. If you don't pass this argument, but do use `--url`, we will look for a `FEEDBOT_KEY` environment variable.
 
 tacking `--problem` or `-p` specifies the (base 0) index of the (single) problem to get feedback on, rather than doing all the problems. Most likely useful during debugging.
 

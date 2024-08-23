@@ -3,12 +3,16 @@ import asyncio
 import json
 import requests
 from openai import AsyncOpenAI
+import os
 import logging
 logger = logging.getLogger(__name__)
 
 from submission import SubmissionTemplate
 from assignment import ProblemStatement, AssignmentStatement
 from query import get_comment
+
+from dotenv import load_dotenv
+load_dotenv()
 
 
 # Sends a POST request to the given URL, using the given list of comments
@@ -40,9 +44,9 @@ def process(assignment_spec_path,
             post_key):
     logger.info("\n\nprocessing submission {} with assignment {} and config {}\n".format(submission_path,assignment_template_path,config_path))
 
-    with open("key", 'r') as key,\
-         open(config_path, 'r') as config:
-        client = AsyncOpenAI(api_key=key.read().rstrip())
+    with open(config_path, 'r') as config:
+        key = os.environ["OPENAI_KEY"]
+        client = AsyncOpenAI(api_key=key)
         config = json.load(config)
         assignment = AssignmentStatement.load(assignment_spec_path, assignment_template_path)
         submission = SubmissionTemplate.load(submission_path)
@@ -74,11 +78,13 @@ def process(assignment_spec_path,
                 answer,
                 submitter_email
             )
-            url = post_url + "/submission/" + json.loads(response.text)['msg'][4:]
-            output["output"] = f"Feedbot automated feedback available at [{url}]({url})."
-            output["output_format"] = "md"
-
-            print(url)
+            if response.status_code == 200:
+                url = post_url + "/submission/" + json.loads(response.text)['msg'][4:]
+                output["output"] = f"Feedbot automated feedback available at [{url}]({url})."
+                output["output_format"] = "md"
+                print(url)
+            else:
+                logger.error("Did not post successfully: " + response.text)
         if results_path:
             with open(results_path, 'w') as results_file:
                 json.dump(output, results_file)
@@ -98,7 +104,7 @@ if __name__ == "__main__":
     parser.add_argument('-p', '--problem', type=int)
     parser.add_argument('-d', '--debug', action='store_true')
     parser.add_argument('-e', '--email', default = "")
-    parser.add_argument('-k', '--key', default = "")
+    parser.add_argument('-k', '--key', default = os.environ.get("FEEDBOT_KEY",""))
 
     args = parser.parse_args()
 
