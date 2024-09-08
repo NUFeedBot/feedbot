@@ -7,7 +7,7 @@ class InternalInconsistency(BaseException):
         self.str = str
 
 
-class MetaDataError:
+class MetaDataError(BaseException):
     def __init__ (self, str):
         self.str = str
 
