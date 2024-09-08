@@ -84,17 +84,17 @@ def get_prompt_using_config(problem, code, assignment, config, dep_code):
 
     return get_prompt_for("general", problem, config) \
         + get_prompt_for("pre_context", problem, config) \
-        + assignment.context \
+        + (f"```\n{assignment.context}\n```" if len(assignment.context.strip()) > 0 else "(no context provided for this assignment)") \
         + get_prompt_for("post_context", problem, config) \
         + get_prompt_for("pre_statement", problem, config) \
-        + problem.statement \
+        + f"```\n{problem.statement}\n```" \
         + get_prompt_for("post_statement", problem, config) \
         + dependencies_pretext \
-        + dep_code \
+        + (f"```{dep_code}```" if has_dependencies else "") \
         + grading_pretext \
         + problem.grading_note \
         + get_prompt_for("pre_code", problem, config) \
-        + code \
+        + f"```{code}```" \
         + get_prompt_for("post_code", problem, config)
         #+ problem.
 

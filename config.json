@@ -6,10 +6,10 @@
     "general#FD": "Note that this problem focuses specifically on function design, so focus on giving feedback about the design recipe for functions: we want to know the FIRST step with issues. Purpose statements are a comment between the signature line and the function definition (1-2 sentances); only give feedback if the purpose statement is missing, confusing, misleading, extremely inaccurate, etc.\n",
     "general#LA": "Note that this problem specifically wants the student to utilize list abstractions such as `foldr`, `foldl`, `map`, `filter`, `andmap`, and `ormap`, in place of recursive list functions.\n",
     "general#US": "Note that this problem has particular instructions, rather than necessarily needing to complete the full design recipe: please give minimal feedback specifically based on the instructions present. If there are mistakes, give HINTS, do not give solutions, for how to fix. \n",
-    "pre_context": "\n\n",
+    "pre_context": "\n\nThe following context and general instructions were given to the student. Any code present in this context was provided by instructors for students to use, and feedback should not be given for it:\n",
     "post_context": "\n\n",
     "pre_statement": "The student was instructed to respond to the following problem statement:\n",
     "post_statement": "\n\n",
-    "pre_code": "\n\nThe student's submission for this problem was:\n",
+    "pre_code": "\n\nThe student's submission for this problem is below. This is what you should give feedback for. They may include content copy-pasted from the problem statement and that's okay:\n",
     "post_code": "\n\nRemember, you are giving SMALL feedback on the code to help the student learn. Do not tell them the answer, and do not write any code for them. Check over your response at the end to ensure that it is concise, that it only gives HINTS, NOT SOLUTIONS, and that if there is an issue with the code you have identified a single specific step the student can focus on."
 }

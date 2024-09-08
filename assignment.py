@@ -1,6 +1,6 @@
 import json
 
-from submission import SubmissionTemplate
+from submission import SubmissionTemplate, MARKER
 from validate import validateJson, validateAssignmentProb
 
 #Returns if given json has the given field and if the data is of given type
@@ -38,5 +38,6 @@ class AssignmentStatement:
     def __init__(self, jsondata, template):
         validateJson(jsondata)
         self.title = jsondata["title"]
-        self.context = json_has_or(jsondata, "context", str, "")
+        # self.context = json_has_or(jsondata, "context", str, "")
+        self.context = template.at(["Context"]).contents()
         self.problems = [ProblemStatement(prob, template) for prob in jsondata["problems"]]
