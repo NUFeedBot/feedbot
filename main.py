@@ -85,6 +85,7 @@ def process(assignment_spec_path,
                 print(url)
             else:
                 logger.error("Did not post successfully: " + response.text)
+        
         if results_path:
             with open(results_path, 'w') as results_file:
                 json.dump(output, results_file)

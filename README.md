@@ -31,20 +31,20 @@ pip install -r requirements.txt
 To run locally, printing to stdout:
 
 ``` python
-python main.py -d -s test_src.rkt -j test_assign.json -a test_assign.rkt -c config.json 
+python main.py -d -s example/ex_submission.rkt -j example/ex_spec.json -a example/ex_assign.rkt -c config.json 
 ```
 
 To run locally, printing to `results.json`
 
 ``` python
-python main.py -s test_src.rkt -j test_assign.json -a test_assign.rkt -c config.json -r results.json 
+python main.py -s example/ex_submission.rkt -j example/ex_spec.json -a example/ex_assign.rkt -c config.json -r example/ex_results.json 
 ```
 
 To post to a server:
 
 
 ``` python
-python main.py -s test_src.rkt -j test_assign.json -a test_assign.rkt -c config.json -r results.json -u https://feedbot.dbp.io -k YOUNEEDTOKNOWTHIS 
+python main.py -s example/ex_submission.rkt -j example/ex_spec.json -a example/ex_assign.rkt -c config.json -r example/ex_results.json -u https://feedbot.dbp.io -k YOUNEEDTOKNOWTHIS 
 ```
 
 ### args
