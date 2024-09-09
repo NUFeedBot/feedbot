@@ -57,11 +57,12 @@ def process(assignment_spec_path,
         #    raise InvalidSubmission("Submission does not have all problems", -1)
 
         answer = asyncio.run(get_comment(client, assignment, submission, config, problem_number))
+        output = {}
 
-        #Default score of 0, needed for gradescope scoring
-        output = {"score": 0.0}
-
-        if not results_path:
+        if results_path:
+            output = answer
+            
+        else:
             print("\n\n\n\nModel Output:")
             for part in answer:
                 print(f"\n\n=============================\n")

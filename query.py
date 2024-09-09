@@ -54,11 +54,13 @@ async def get_comment_on_prob(client, assignment, submission, problem, config):
 
     res = {
         "path" : ", ".join(problem.path),
+        "prompt" : "none",
         "text" : "none",
         "code" : code
     }
 
     prompt = get_prompt_using_config(problem, code, assignment, config, dependencies_code)
+    res["prompt"] = prompt
     res["text"] = await make_api_request(config["model"], client, prompt, "=>".join(problem.path), config["system"])
     res["text"] = redact_codeblocks(res["text"])
 
