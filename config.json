@@ -10,6 +10,6 @@
     "post_context": "\n\n",
     "pre_statement": "The student was instructed to respond to the following problem statement:\n",
     "post_statement": "\n\n",
-    "pre_code": "\n\nThe student's submission for this problem was:\n",
-    "post_code": "\n\nRemember, you are giving SMALL feedback on the code to help the student learn. Do not tell them the answer, and do not write any code for them. Check over your response at the end to ensure that it is concise, that it only gives HINTS, NOT SOLUTIONS, and that if there is an issue with the code you have identified a single specific step the student can focus on."
+    "pre_code": "\n\nThe student's submission for this problem was:\n```\n",
+    "post_code": "\n```\n\nRemember, you are giving SMALL feedback on the code to help the student learn. Do not tell them the answer, and do not write any code for them. Check over your response at the end to ensure that it is concise, that it only gives HINTS, NOT SOLUTIONS, and that if there is an issue with the code you have identified a single specific step the student can focus on."
 }

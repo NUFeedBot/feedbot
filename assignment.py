@@ -17,7 +17,7 @@ class ProblemStatement:
     def __init__(self, prob_data, template):
         self.path = prob_data["path"]
         validateAssignmentProb(self.path, template)
-        self.statement = template.at(self.path).contents()
+        self.statement = template.at(self.path, False).contents()
         self.title = json_has_or(prob_data, "title", str, "") # What is the purpose of title?
         self.stub = json_has_or(prob_data, "stub", str, "")
         self.tags = json_has_or(prob_data, "tags", list, [])

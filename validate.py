@@ -80,7 +80,7 @@ def validateAssignmentProb(prob_path, assignment):
     Ensures that the problem actually exists in the template
     """
 
-    if not assignment.at(prob_path).has_data(): raise InternalInconsistency(f"Problem path {prob_path} must exist in template")
+    if not assignment.at(prob_path, False).has_data(): raise InternalInconsistency(f"Problem path {prob_path} must exist in template")
 
 
 
@@ -89,4 +89,4 @@ def validateSubmissionProb(prob_path, submission):
     Ensures that a submission for the given problem actually exists
     """
 
-    if not submission.at(prob_path).has_data(): raise SubmissionInconsistency(f"Problem path {prob_path} must exist in submission")
+    if not submission.at(prob_path, False).has_data(): raise SubmissionInconsistency(f"Problem path {prob_path} must exist in submission")

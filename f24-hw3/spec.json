@@ -1,0 +1,88 @@
+{
+    "assignment": {
+        "title": "2024 F1 HW3",
+        "problems": [
+            {
+                "path": [
+                    "Problem 1",
+                    "Part A"
+                ],
+                "tags": [
+                    "DD"
+                ]
+            },
+            {
+                "path": [
+                    "Problem 1",
+                    "Part B"
+                ],
+                "tags": [
+                    "FD"
+                ]
+            },
+            {
+                "path": [
+                    "Problem 1",
+                    "Part C"
+                ],
+                "tags": [
+                    "FD"
+                ]
+            },
+            {
+                "path": [
+                    "Problem 2",
+                    "Part A"
+                ],
+                "tags": [
+                    "DD"
+                ]
+            },
+            {
+                "path": [
+                    "Problem 2",
+                    "Part B"
+                ],
+                "tags": [
+                    "FD"
+                ]
+            },
+            {
+                "path": [
+                    "Problem 2",
+                    "Part C"
+                ],
+                "tags": [
+                    "FD"
+                ]
+            },
+            {
+                "path": [
+                    "Problem 3",
+                    "Part A"
+                ],
+                "tags": [
+                    "DD"
+                ]
+            },
+            {
+                "path": [
+                    "Problem 3",
+                    "Part B"
+                ],
+                "tags": [
+                    "FD"
+                ]
+            },
+            {
+                "path": [
+                    "Problem 3",
+                    "Part C"
+                ],
+                "tags": [
+                    "FD"
+                ]
+            }
+        ]
+    }
+}

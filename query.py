@@ -49,7 +49,7 @@ async def get_comment(client, assignment, submission, config, prob=None):
 # (OpenAI, Assignment, SubmissionTemplate, ProblemStatement, dict) -> dict
 async def get_comment_on_prob(client, assignment, submission, problem, config):
     validateSubmissionProb(problem.path, submission)
-    code = submission.at(problem.path).contents()
+    code = submission.at(problem.path, True).contents()
     dependencies_code = submission.extract_responses(problem.dependencies)
 
     res = {
