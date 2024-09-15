@@ -1,7 +1,7 @@
 from typing import List
 
 MARKER = ";;!"
-
+RESPONSE_MARKER = ";;!!"
 # Represents an rkt file/txt file that is either a student submitted file, assignment file, or a specific assignment problem
 class SubmissionTemplate:
     @staticmethod
@@ -38,16 +38,22 @@ class SubmissionTemplate:
         """
         return "\n".join(self.lines)
 
-    def at(self, path):
+    def at(self, path, is_student_response):
         """
-        Returns the contents indexed by the given path of marker strings
+        Returns the contents indexed by the given path of marker strings..
 
+        Returns only problem __instructions__ (text before response marker) if is_student_response is false. 
+        Returns only student response (text after response marker) if is_student_response is true
+    
         """
         if path == []:
-            return self.before(MARKER)
+            if is_student_response:
+                return self.after(RESPONSE_MARKER).before(MARKER)
+            else:
+                return self.before(MARKER)
         else:
-            return self.after(MARKER + " " + path[0]).at(path[1:])
-    
+            return self.after(MARKER + " " + path[0]).at(path[1:], is_student_response)
+
 
     def extract_responses(self, problem_paths):
         """
