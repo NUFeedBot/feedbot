@@ -39,5 +39,5 @@ class AssignmentStatement:
         validateJson(jsondata)
         self.title = jsondata["title"]
         # self.context = json_has_or(jsondata, "context", str, "")
-        self.context = template.at(["Context"]).contents()
+        self.context = template.at(["Context"], False).contents()
         self.problems = [ProblemStatement(prob, template) for prob in jsondata["problems"]]
