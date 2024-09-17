@@ -48,21 +48,24 @@ async def get_comment(client, assignment, submission, config, prob=None):
 # given the OpenAI client, asignment, student submission, the problem, and config 
 # (OpenAI, Assignment, SubmissionTemplate, ProblemStatement, dict) -> dict
 async def get_comment_on_prob(client, assignment, submission, problem, config):
-    validateSubmissionProb(problem.path, submission)
-    code = submission.at(problem.path, True).contents()
-    dependencies_code = submission.extract_responses(problem.dependencies)
+    try:
+        validateSubmissionProb(problem.path, submission)
+        code = submission.at(problem.path, True).contents()
+        dependencies_code = submission.extract_responses(problem.dependencies)
 
-    res = {
-        "path" : ", ".join(problem.path),
-        "prompt" : "none",
-        "text" : "none",
-        "code" : code
-    }
+        res = {
+            "path" : ", ".join(problem.path),
+            "prompt" : "none",
+            "text" : "none",
+            "code" : code
+        }
 
-    prompt = get_prompt_using_config(problem, code, assignment, config, dependencies_code)
-    res["prompt"] = prompt
-    res["text"] = await make_api_request(config["model"], client, prompt, "=>".join(problem.path), config["system"])
-    res["text"] = redact_codeblocks(res["text"])
+        prompt = get_prompt_using_config(problem, code, assignment, config, dependencies_code)
+        res["prompt"] = prompt
+        res["text"] = await make_api_request(config["model"], client, prompt, "=>".join(problem.path), config["system"])
+        res["text"] = redact_codeblocks(res["text"])
+    except:
+        logging.exception('')
 
     return res
 
@@ -78,27 +81,44 @@ def redact_codeblocks(text):
 # (ProblemStatement, str, dict, dict, str) -> str
 def get_prompt_using_config(problem, code, assignment, config, dep_code):
     has_grading_note = (problem.grading_note != "")
-    grading_pretext = "\nThis specific problem has another additional grading note:\n" if has_grading_note else ""
-
     has_dependencies = (dep_code != "")
-    dependencies_pretext = "\n This problem relies on the following student responses for some previous questions: \n" \
-    if has_dependencies else ""
+    has_context = (assignment.context.strip() != "")
+    has_code = (code.strip() != "")
 
-    return get_prompt_for("general", problem, config) \
-        + get_prompt_for("pre_context", problem, config) \
-        + (f"```\n{assignment.context}\n```" if len(assignment.context.strip()) > 0 else "(no context provided for this assignment)") \
-        + get_prompt_for("post_context", problem, config) \
-        + get_prompt_for("pre_statement", problem, config) \
+    # general prompt
+    prompt = get_prompt_for("general", problem, config)
+
+    # context (i.e. if the instructor provided extra instructions or data definitions at the top of the code)
+    if has_context:
+        prompt += get_prompt_for("pre_context", problem, config) \
+        + f"```\n{assignment.context}```" \
+        + get_prompt_for("post_context", problem, config)
+    
+    # the problem statement (for the specific part, i.e. Problem 1D, or Problem 7A)
+    prompt += get_prompt_for("pre_statement", problem, config) \
         + f"```\n{problem.statement}\n```" \
-        + get_prompt_for("post_statement", problem, config) \
-        + dependencies_pretext \
-        + (f"```{dep_code}```" if has_dependencies else "") \
-        + grading_pretext \
-        + problem.grading_note \
-        + get_prompt_for("pre_code", problem, config) \
+        + get_prompt_for("post_statement", problem, config)
+    
+    # an additional grading note, if provided in the spec
+    if has_grading_note:
+        prompt += get_prompt_for("pre_gradenote", problem, config) \
+        + f"```\n{problem.grading_note}\n```" \
+        + get_prompt_for("post_gradenote", problem, config)
+
+
+    # past code from the student, if it is relevant for this problem
+    if has_dependencies:
+        prompt += get_prompt_for("pre_dependencies", problem, config) \
+        + f"```\n{dep_code}\n```" \
+        + get_prompt_for("post_dependencies", problem, config)
+    
+    # finally, student code
+    code = code if has_code else ";; blank response"
+    prompt += get_prompt_for("pre_code", problem, config) \
         + f"```{code}```" \
         + get_prompt_for("post_code", problem, config)
-        #+ problem.
+    
+    return prompt
 
 # Gets the prompt info for a certain config attribute name
 # names followed by #TAG will also be included if the problem has that tag
