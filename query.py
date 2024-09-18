@@ -66,6 +66,12 @@ async def get_comment_on_prob(client, assignment, submission, problem, config):
         res["text"] = redact_codeblocks(res["text"])
     except:
         logging.exception('')
+        res = {
+            "path": "ERROR",
+            "prompt": "ERROR",
+            "text": "ERROR",
+            "code": "ERROR"
+        }
 
     return res
 
@@ -115,7 +121,7 @@ def get_prompt_using_config(problem, code, assignment, config, dep_code):
     # finally, student code
     code = code if has_code else ";; blank response"
     prompt += get_prompt_for("pre_code", problem, config) \
-        + f"```{code}```" \
+        + f"```\n{code}\n```" \
         + get_prompt_for("post_code", problem, config)
     
     return prompt

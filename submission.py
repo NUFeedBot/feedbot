@@ -64,7 +64,7 @@ class SubmissionTemplate:
 
         for path in problem_paths:
             path_str = ",".join(path)
-            dependencies += f"Student response for {path_str}: \n" + self.at(path).contents()
+            dependencies += f"Student response for {path_str}: \n" + self.at(path, True).contents()
         
         
         return dependencies
