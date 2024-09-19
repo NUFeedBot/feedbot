@@ -2,6 +2,10 @@
 def json_has(jsondata, field, type):
     return field in jsondata and isinstance(jsondata[field], type)
 
+#Returns data if json_has, else returns provided default fallback value
+def json_has_or(jsondata, field, type, default):
+    return jsondata[field] if json_has(jsondata, field, type) else default
+
 class InternalInconsistency(BaseException):
     def __init__(self, str):
         self.str = str

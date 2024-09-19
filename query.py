@@ -1,10 +1,9 @@
-import json
 import asyncio
 import re
 import tiktoken
 import logging
 logger = logging.getLogger(__name__)
-from validate import validateSubmissionProb
+from validate import validateSubmissionProb, json_has, json_has_or
 
 # Makes an API request with the given string prompt
 # (OpenAI, str, str, str, str) -> str
@@ -27,6 +26,7 @@ async def make_api_request(model, client, prompt, prob_path, sysmsg=None):
     chat_completion = await client.chat.completions.create(
         messages=messages,
         model=model,
+        temperature=0.22
     )
 
     return chat_completion.choices[0].message.content
@@ -63,7 +63,10 @@ async def get_comment_on_prob(client, assignment, submission, problem, config):
         prompt = get_prompt_using_config(problem, code, assignment, config, dependencies_code)
         res["prompt"] = prompt
         res["text"] = await make_api_request(config["model"], client, prompt, "=>".join(problem.path), config["system"])
+        if json_has(config, "delimiter", str):
+            res["text"] = cut_at_delimiter(res["text"], config["delimiter"])
         res["text"] = redact_codeblocks(res["text"])
+        res["text"] = res["text"].strip()
     except:
         logging.exception('')
         res = {
@@ -74,6 +77,14 @@ async def get_comment_on_prob(client, assignment, submission, problem, config):
         }
 
     return res
+
+# Given a string and delimiter, returns the part of the string occuring after 
+# the delimiter, or "[internal error]" if the delimiter is not present
+# (str, str) -> str
+def cut_at_delimiter(text, delimiter):
+    sides = text.split(delimiter)
+    if len(sides) < 2: return "[internal error]"
+    return sides[-1]
 
 # Given a string, replaces all markdown code blocks with "[CODE REDACTED]"
 # str -> str
@@ -97,31 +108,31 @@ def get_prompt_using_config(problem, code, assignment, config, dep_code):
     # context (i.e. if the instructor provided extra instructions or data definitions at the top of the code)
     if has_context:
         prompt += get_prompt_for("pre_context", problem, config) \
-        + f"```\n{assignment.context}```" \
+        + f"```\n{assignment.context.strip()}```" \
         + get_prompt_for("post_context", problem, config)
     
     # the problem statement (for the specific part, i.e. Problem 1D, or Problem 7A)
     prompt += get_prompt_for("pre_statement", problem, config) \
-        + f"```\n{problem.statement}\n```" \
+        + f"```\n{problem.statement.strip()}\n```" \
         + get_prompt_for("post_statement", problem, config)
     
     # an additional grading note, if provided in the spec
     if has_grading_note:
         prompt += get_prompt_for("pre_gradenote", problem, config) \
-        + f"```\n{problem.grading_note}\n```" \
+        + f"```\n{problem.grading_note.strip()}\n```" \
         + get_prompt_for("post_gradenote", problem, config)
 
 
     # past code from the student, if it is relevant for this problem
     if has_dependencies:
         prompt += get_prompt_for("pre_dependencies", problem, config) \
-        + f"```\n{dep_code}\n```" \
+        + f"```\n{dep_code.strip()}\n```" \
         + get_prompt_for("post_dependencies", problem, config)
     
     # finally, student code
     code = code if has_code else ";; blank response"
     prompt += get_prompt_for("pre_code", problem, config) \
-        + f"```\n{code}\n```" \
+        + f"```\n{code.strip()}\n```" \
         + get_prompt_for("post_code", problem, config)
     
     return prompt

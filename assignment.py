@@ -1,15 +1,7 @@
 import json
 
 from submission import SubmissionTemplate, MARKER
-from validate import validateJson, validateAssignmentProb
-
-#Returns if given json has the given field and if the data is of given type
-def json_has(jsondata, field, type):
-    return field in jsondata and isinstance(jsondata[field], type)
-
-#Returns data if json_has, else returns provided default fallback value
-def json_has_or(jsondata, field, type, default):
-    return jsondata[field] if json_has(jsondata, field, type) else default
+from validate import validateJson, validateAssignmentProb, json_has, json_has_or
 
 
 #Represents a single problem in an assignment along with its metadata
