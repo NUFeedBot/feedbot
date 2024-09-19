@@ -6,9 +6,11 @@ import json
 import requests
 from openai import AsyncOpenAI
 import os
+import sys
 import logging
 logger = logging.getLogger(__name__)
 
+from starter_checker import submission_uses_starter
 from submission import SubmissionTemplate
 from assignment import ProblemStatement, AssignmentStatement
 from query import get_comment
@@ -31,7 +33,12 @@ def process(assignment_spec_path,
     with open(config_path, 'r') as config:
         key = os.environ["OPENAI_KEY"]
         config = json.load(config)
-        # TODO: Verify the submission follows the starter file.
+
+        output_lines = []
+        if not submission_uses_starter(output_lines, submission_path, assignment_template_path):
+            print("\n".join(output_lines)) 
+            sys.exit(1) # TODO: Verify this error code 1 can't come from other places.
+
         assignment = AssignmentStatement.load(assignment_spec_path, assignment_template_path)
         submission = SubmissionTemplate.load(submission_path)
         #subdata = slice_submission(submission_path)
