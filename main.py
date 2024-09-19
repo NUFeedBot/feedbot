@@ -16,24 +16,6 @@ from query import get_comment
 from dotenv import load_dotenv
 load_dotenv()
 
-
-# Sends a POST request to the given URL, using the given list of comments
-# (str (URL), List[Comment], str (Email)) -> Response
-def send_request(url, key, comments, submitter_email):
-    addendum = 'entry'
-
-    request_obj = {
-        'comments': json.dumps(
-            {
-                "comments": comments
-            },
-        ),
-        'email': submitter_email,
-        'key': key
-    }
-
-    return requests.post(url + "/" + addendum, params=request_obj)
-
 def process(assignment_spec_path,
             assignment_template_path,
             submission_path,
@@ -96,6 +78,22 @@ def process(assignment_spec_path,
             with open(results_path, 'w') as results_file:
                 json.dump(output, results_file)
 
+# Sends a POST request to the given URL, using the given list of comments
+# (str (URL), List[Comment], str (Email)) -> Response
+def send_request(url, key, comments, submitter_email):
+    addendum = 'entry'
+
+    request_obj = {
+        'comments': json.dumps(
+            {
+                "comments": comments
+            },
+        ),
+        'email': submitter_email,
+        'key': key
+    }
+
+    return requests.post(url + "/" + addendum, params=request_obj)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
