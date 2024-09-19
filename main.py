@@ -31,6 +31,7 @@ def process(assignment_spec_path,
     with open(config_path, 'r') as config:
         key = os.environ["OPENAI_KEY"]
         config = json.load(config)
+        # TODO: Verify the submission follows the starter file.
         assignment = AssignmentStatement.load(assignment_spec_path, assignment_template_path)
         submission = SubmissionTemplate.load(submission_path)
         #subdata = slice_submission(submission_path)
