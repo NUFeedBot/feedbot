@@ -99,12 +99,12 @@ python main.py -s ../feedbot-data/f1-f23-hw1/reference.rkt -a ../feedbot-data/f1
 `batch-test.py` can run several possible config files against several submissions for an assignment, and
 put the results in a readable HTML format.
 
-The tacks are
-`-s`, `--submissions` for a FOLDER containing all of the submissions to run on
-`-c`, `--configs` for a FOLDER containing all of the config (json) files to run on
-`-r`, `--results` for a FOLDER to output resulting JSON and HTML files to
-`-a`, `--assignment` for the file with the assignment problems (must correspond with `-j` metadata)
-`-j`, `--spec` for the metadata spec describing the structure of the assignment file
-`-p`, `--problem` for the problem to run on (optional: if left blank will do all problems)
+The tacks are: \
+`-s`, `--submissions` for a FOLDER containing all of the submissions to run on \
+`-c`, `--configs` for a FOLDER containing all of the config (json) files to run on \
+`-r`, `--results` for a FOLDER to output resulting JSON and HTML files to \
+`-a`, `--assignment` for the file with the assignment problems (must correspond with `-j` metadata) \
+`-j`, `--spec` for the metadata spec describing the structure of the assignment file \
+`-p`, `--problem` for the problem to run on (optional: if left blank will do all problems) \
 `-n`, `--count` for the number of times to repeat each prompt (to look at consistency)
 
