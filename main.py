@@ -34,7 +34,6 @@ def send_request(url, key, comments, submitter_email):
 
     return requests.post(url + "/" + addendum, params=request_obj)
 
-
 def process(assignment_spec_path,
             assignment_template_path,
             submission_path,
@@ -43,19 +42,23 @@ def process(assignment_spec_path,
             post_url,
             results_path,
             submitter_email,
-            post_key):
+            post_key,
+            dry_run):
     logger.info("\n\nprocessing submission {} with assignment {} and config {}\n".format(submission_path,assignment_template_path,config_path))
 
     with open(config_path, 'r') as config:
         key = os.environ["OPENAI_KEY"]
-        client = AsyncOpenAI(api_key=key)
         config = json.load(config)
         assignment = AssignmentStatement.load(assignment_spec_path, assignment_template_path)
         submission = SubmissionTemplate.load(submission_path)
         #subdata = slice_submission(submission_path)
         #if not subdata.has_all_problems(range(len(assignment.problems))):
         #    raise InvalidSubmission("Submission does not have all problems", -1)
-
+        if dry_run:
+            dummy_url = "dummy.url.io"
+            print(dummy_url)
+            return
+        client = AsyncOpenAI(api_key=key)
         answer = asyncio.run(get_comment(client, assignment, submission, config, problem_number))
         output = {}
 
@@ -109,10 +112,11 @@ if __name__ == "__main__":
     parser.add_argument('-d', '--debug', action='store_true')
     parser.add_argument('-e', '--email', default = "")
     parser.add_argument('-k', '--key', default = os.environ.get("FEEDBOT_KEY",""))
+    parser.add_argument('--dry-run', default = True)
 
     args = parser.parse_args()
 
     if args.debug:
         logging.basicConfig(level=logging.INFO)
 
-    process(args.spec, args.assignment, args.submission, args.config, args.problem, args.url, args.result, args.email, args.key)
+    process(args.spec, args.assignment, args.submission, args.config, args.problem, args.url, args.result, args.email, args.key, args.dry_run)
