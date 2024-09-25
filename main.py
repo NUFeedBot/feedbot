@@ -27,7 +27,7 @@ def process(assignment_spec_path,
             results_path,
             submitter_email,
             post_key,
-            dry_run):
+            disable_dry_run):
     logger.info("\n\nprocessing submission {} with assignment {} and config {}\n".format(submission_path,assignment_template_path,config_path))
 
     with open(config_path, 'r') as config:
@@ -44,7 +44,7 @@ def process(assignment_spec_path,
         #subdata = slice_submission(submission_path)
         #if not subdata.has_all_problems(range(len(assignment.problems))):
         #    raise InvalidSubmission("Submission does not have all problems", -1)
-        if dry_run:
+        if not disable_dry_run:
             dummy_url = "dummy.url.io"
             print(dummy_url)
             return
@@ -118,11 +118,11 @@ if __name__ == "__main__":
     parser.add_argument('-d', '--debug', action='store_true')
     parser.add_argument('-e', '--email', default = "")
     parser.add_argument('-k', '--key', default = os.environ.get("FEEDBOT_KEY",""))
-    parser.add_argument('--dry-run', default = True)
+    parser.add_argument('--disable-dry-run', action='store_true', default = False)
 
     args = parser.parse_args()
 
     if args.debug:
         logging.basicConfig(level=logging.INFO)
 
-    process(args.spec, args.assignment, args.submission, args.config, args.problem, args.url, args.result, args.email, args.key, args.dry_run)
+    process(args.spec, args.assignment, args.submission, args.config, args.problem, args.url, args.result, args.email, args.key, args.disable_dry_run)
