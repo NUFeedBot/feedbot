@@ -22,7 +22,7 @@ def submission_uses_starter(output_lines, submission_path, template_path):
     differ = difflib.Differ()
     diff = differ.compare(template_lines, submission_lines)
 
-    output_lines.append("The submission does not follow the starter code. Look at the output below.")
+    output_lines.append("FeedBot was not run because the submission does not follow the starter code. Look at the output below.")
     output_lines.append("Lines starting with '-' are missing from your submission.")
     output_lines.append("Lines starting with '+' are extra lines in your submission.")
     output_lines.append("")
