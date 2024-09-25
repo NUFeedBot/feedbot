@@ -84,7 +84,7 @@ def get_prompt_using_config(problem, code, assignment, config, dep_code):
 
     return get_prompt_for("general", problem, config) \
         + get_prompt_for("pre_context", problem, config) \
-        + assignment.context \
+        + problem.context \
         + get_prompt_for("post_context", problem, config) \
         + get_prompt_for("pre_statement", problem, config) \
         + problem.statement \

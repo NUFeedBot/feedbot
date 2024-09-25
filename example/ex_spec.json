@@ -1,6 +1,14 @@
 {
     "assignment": {
         "title": "Example Assignment 1",
+        "contexts": [
+            {
+                "path": [
+                    "Problem 1"
+                ],
+                "code": "Empty context: no code given to student as context. "
+            }
+        ],
         "problems": [
             {
                 "path": [
