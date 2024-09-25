@@ -9,6 +9,8 @@
 ;; a Match, which consist of some number of players divided into two teams. Each
 ;; match must also have a type, either best-of-3 or best-of-5.
 
+;;!! Write your code below:
+
 ;;! Problem 2
 
 ;; Design a function `validate-match` that returns true if and only if a match
@@ -17,15 +19,18 @@
 ;; be present multiple times (i.e. there can't be two players with the same
 ;; name).
 
+;;!! Write your code below:
+
 
 ;;! Problem 3
-
 
 ;;! Part A
 
 ;; Design a function `strength-diff` that returns the absolute value of the
 ;; difference in total strength between two teams in a match. The total strength
 ;; is the sum of the strength scores of all players on a team.
+
+;;!! Write your code below:
 
 
 ;;! Part B
@@ -51,3 +56,5 @@
 ;;
 ;; - If the stength and endurance scores are exactly the same, the game is a
 ;; draw
+
+;;!! Write your code below:

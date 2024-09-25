@@ -9,6 +9,9 @@
 
 ;;! Problem 1
 
+;; Instructions...
+
+;;!! Write your code below:
 (define-struct player [name strength endurance])
 ; A Player is a (make-player String PosInt PosInt)
 ; The String is the player's name, the first PosInt is their strength score, the second is their \
@@ -24,6 +27,10 @@
 
 ;;! Problem 2
 
+;; Instructions...
+
+;;!! Write your code below:
+
 ; validate-match: Match -> Boolean
 ; Returns true if and only if a match is valid blah blah blah...
 (define (validate-match m)
@@ -34,9 +41,11 @@
 
 ;;! Problem 3
 
-
 ;;! Part A
 
+;; Instructions...
+
+;;!! Write your code below:
 (define (prop-diff m p) 
   (- (foldr + 0 (map p (match-team1 m)))
      (foldr + 0 (map p (match-team2 m)))))
@@ -46,6 +55,11 @@
 (define (strength-diff m) (prop-diff m player-strength))
 
 ;;! Part B
+
+;; Instructions...
+
+;;!! Write your code below:
+
 
 ; A MatchResult is one of:
 ; - "invalid"

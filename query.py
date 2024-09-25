@@ -99,7 +99,7 @@ def redact_codeblocks(text):
 def get_prompt_using_config(problem, code, assignment, config, dep_code):
     has_grading_note = (problem.grading_note != "")
     has_dependencies = (dep_code != "")
-    has_context = (assignment.context.strip() != "")
+    has_context = (problem.context.strip() != "")
     has_code = (code.strip() != "")
 
     # general prompt
@@ -108,7 +108,7 @@ def get_prompt_using_config(problem, code, assignment, config, dep_code):
     # context (i.e. if the instructor provided extra instructions or data definitions at the top of the code)
     if has_context:
         prompt += get_prompt_for("pre_context", problem, config) \
-        + f"```\n{assignment.context.strip()}```" \
+        + f"```\n{problem.context.strip()}\n```" \
         + get_prompt_for("post_context", problem, config)
     
     # the problem statement (for the specific part, i.e. Problem 1D, or Problem 7A)

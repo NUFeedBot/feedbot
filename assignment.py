@@ -6,7 +6,8 @@ from validate import validateJson, validateAssignmentProb, json_has, json_has_or
 
 #Represents a single problem in an assignment along with its metadata
 class ProblemStatement:
-    def __init__(self, prob_data, template):
+    def __init__(self, prob_data, template, prob_context):
+        self.context = prob_context
         self.path = prob_data["path"]
         validateAssignmentProb(self.path, template)
         self.statement = template.at(self.path, False).contents()
@@ -30,6 +31,20 @@ class AssignmentStatement:
     def __init__(self, jsondata, template):
         validateJson(jsondata)
         self.title = jsondata["title"]
-        # self.context = json_has_or(jsondata, "context", str, "")
-        self.context = template.at(["Context"], False).contents()
-        self.problems = [ProblemStatement(prob, template) for prob in jsondata["problems"]]
+        self.problem_contexts = jsondata["contexts"] # The list of (path+context) for each path
+        self.problems = []
+        for prob in jsondata["problems"]:
+            prob_context = self.get_problem_context(prob["path"])
+            self.problems.append(ProblemStatement(prob, template, prob_context))
+   
+    #Returns the problem context for the given path
+    # returns common context for paths that are deeper that context paths
+    # ie. context for Problem 1 will be returned as the context for Problem 1, Part A 
+    def get_problem_context(self, prob_path):
+        context_str = "\n"
+        for context in self.problem_contexts:
+            context_path = context["path"]
+            if prob_path[:len(context_path)] == context_path:  
+                context_str += context["code"] + "\n\n"
+        
+        return context_str
