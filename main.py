@@ -37,7 +37,7 @@ def process(assignment_spec_path,
         output_lines = []
         if not submission_uses_starter(output_lines, submission_path, assignment_template_path):
             print("\n".join(output_lines)) 
-            sys.exit(1) # TODO: Verify this error code 1 can't come from other places.
+            sys.exit(42) # TODO: Verify this error code can't come from other places.
 
         assignment = AssignmentStatement.load(assignment_spec_path, assignment_template_path)
         submission = SubmissionTemplate.load(submission_path)
