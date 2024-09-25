@@ -36,6 +36,7 @@ def process(assignment_spec_path,
 
         output_lines = []
         if not submission_uses_starter(output_lines, submission_path, assignment_template_path):
+            # TODO: Print that FeedBot was not run because the file did not follow the starter.
             print("\n".join(output_lines)) 
             sys.exit(1) # TODO: Verify this error code 1 can't come from other places.
 
