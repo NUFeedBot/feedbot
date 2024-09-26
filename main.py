@@ -52,9 +52,9 @@ def process(assignment_spec_path,
         answer = asyncio.run(get_comment(client, assignment, submission, config, problem_number))
         output = {}
 
-        if post_url or results_path:
+        if results_path:
             output = answer
-        else:
+        elif not post_url:
             print("\n\n\n\nModel Output:")
             for part in answer:
                 print(f"\n\n=============================\n")
@@ -117,8 +117,7 @@ if __name__ == "__main__":
     parser.add_argument('-d', '--debug', action='store_true')
     parser.add_argument('-e', '--email', default = "")
     parser.add_argument('-k', '--key', default = os.environ.get("FEEDBOT_KEY",""))
-    parser.add_argument('--disable-dry-run', dest='dry-run', action='store_true')
-    parser.add_argument('--dry-run', action='store_true', default = False)
+    parser.add_argument('--dry-run', action=argparse.BooleanOptionalAction)
 
     args = parser.parse_args()
 
