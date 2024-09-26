@@ -52,7 +52,7 @@ def process(assignment_spec_path,
         answer = asyncio.run(get_comment(client, assignment, submission, config, problem_number))
         output = {}
 
-        if not url or results_path:
+        if post_url or results_path:
             output = answer
         else:
             print("\n\n\n\nModel Output:")
