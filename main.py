@@ -117,7 +117,7 @@ if __name__ == "__main__":
     parser.add_argument('-d', '--debug', action='store_true')
     parser.add_argument('-e', '--email', default = "")
     parser.add_argument('-k', '--key', default = os.environ.get("FEEDBOT_KEY",""))
-    parser.add_argument('--disable-dry-run', default = False)
+    parser.add_argument('--disable-dry-run', action = "store_true", default = False)
 
     args = parser.parse_args()
 
