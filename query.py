@@ -21,7 +21,7 @@ async def make_api_request(model, client, prompt, prob_path, sysmsg=None):
 
     # This is a little inaccurate, since it counts the role stuff, but should be okay
     ts = tokenizer.encode(str(messages))
-    logger.info(f"\n--------------------------------------------\nTOKENS: {len(ts)}\n--------------------------------------------\n=================================================================================================\n\n\n")
+    logger.info(f"\n--------------------------------------------\n INPUT TOKENS: {len(ts)}\n--------------------------------------------\n")
 
     chat_completion = await client.chat.completions.create(
         messages=messages,
@@ -29,6 +29,12 @@ async def make_api_request(model, client, prompt, prob_path, sysmsg=None):
         temperature=0.22
     )
 
+    #Output token usage
+    ts = tokenizer.encode(str(chat_completion.choices[0].message.content))
+    logger.info(f"\n--------------------------------------------\n OUTPUT TOKENS: {len(ts)}\n--------------------------------------------\n")
+
+    logger.info("=================================================================================================\n\n\n")
+    
     return chat_completion.choices[0].message.content
 
 # Gets a response from OpenAI, given the OpenAI client, the assignment, student submission, 
