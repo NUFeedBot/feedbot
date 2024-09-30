@@ -9,29 +9,31 @@ from validate import validateSubmissionProb, json_has, json_has_or
 # (OpenAI, str, str, str, str) -> str
 async def make_api_request(model, client, prompt, prob_path, sysmsg=None):
     messages=[]
-    if sysmsg is not None:
-        messages.append({ "role": "system", "content": sysmsg })
+    # NOTE(dbp 2024/9/24): no system messages in o1-mini for now
+    #if sysmsg is not None:
+    #    messages.append({ "role": "system", "content": sysmsg })
     messages.append({ "role": "user", "content": prompt })
 
 
 
-    logger.info(f"\n{prob_path}\n=================================================================================================\nUser: \n\{prompt}\n")
+    logger.info(f"\n{prob_path}\n=================================================================================================\nUser: \n{prompt}\n")
 
-    tokenizer = tiktoken.encoding_for_model(model)
+    #tokenizer = tiktoken.encoding_for_model(model)
 
     # This is a little inaccurate, since it counts the role stuff, but should be okay
-    ts = tokenizer.encode(str(messages))
-    logger.info(f"\n--------------------------------------------\n INPUT TOKENS: {len(ts)}\n--------------------------------------------\n")
+    #ts = tokenizer.encode(str(messages))
+    #logger.info(f"\n--------------------------------------------\n INPUT TOKENS: {len(ts)}\n--------------------------------------------\n")
 
     chat_completion = await client.chat.completions.create(
         messages=messages,
         model=model,
-        temperature=0.22
+        # NOTE(dbp 2024/9/24): no temp in o1-mini for now
+        #temperature=0.22
     )
 
     #Output token usage
-    ts = tokenizer.encode(str(chat_completion.choices[0].message.content))
-    logger.info(f"\n--------------------------------------------\n OUTPUT TOKENS: {len(ts)}\n--------------------------------------------\n")
+    #ts = tokenizer.encode(str(chat_completion.choices[0].message.content))
+    #logger.info(f"\n--------------------------------------------\n OUTPUT TOKENS: {len(ts)}\n--------------------------------------------\n")
 
     logger.info("=================================================================================================\n\n\n")
     

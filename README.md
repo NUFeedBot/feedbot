@@ -28,6 +28,8 @@ pip install -r requirements.txt
 
 ## running
 
+TODO: update below for required `--disable-dry-run` parameter.
+
 To run locally, printing to stdout:
 
 ``` python
