@@ -85,6 +85,8 @@ async def get_comment_on_prob(client, assignment, submission, problem, config):
             res["text"] = cut_at_delimiter(res["text"], config["delimiter"])
         res["text"] = redact_codeblocks(res["text"])
         res["text"] = res["text"].strip()
+        if res["text"] == "":
+            res["text"] = "FeedBot got confused. We're sorry!"
     except:
         logging.exception('')
         res = {
