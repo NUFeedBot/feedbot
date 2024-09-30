@@ -91,16 +91,15 @@ def send_request(url, key, comments, submitter_email):
     addendum = 'entry'
 
     request_obj = {
-        'comments': json.dumps(
+        'comments':
             {
                 "comments": comments
             },
-        ),
         'email': submitter_email,
         'key': key
     }
 
-    return requests.post(url + "/" + addendum, params=request_obj)
+    return requests.post(url + "/" + addendum, json=request_obj)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
