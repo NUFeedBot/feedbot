@@ -9,9 +9,12 @@ from validate import validateSubmissionProb, json_has, json_has_or
 # (OpenAI, str, str, str, str) -> str
 async def make_api_request(model, client, prompt, prob_path, sysmsg=None):
     messages=[]
-    # NOTE(dbp 2024/9/24): no system messages in o1-mini for now
-    #if sysmsg is not None:
-    #    messages.append({ "role": "system", "content": sysmsg })
+
+    is_o1 = model == "o1-mini"
+
+    if sysmsg is not None and not is_o1:
+        # NOTE(dbp 2024/9/24): no system messages in o1-mini for now
+        messages.append({ "role": "system", "content": sysmsg })
     messages.append({ "role": "user", "content": prompt })
 
 
@@ -24,12 +27,19 @@ async def make_api_request(model, client, prompt, prob_path, sysmsg=None):
     #ts = tokenizer.encode(str(messages))
     #logger.info(f"\n--------------------------------------------\n INPUT TOKENS: {len(ts)}\n--------------------------------------------\n")
 
-    chat_completion = await client.chat.completions.create(
-        messages=messages,
-        model=model,
-        # NOTE(dbp 2024/9/24): no temp in o1-mini for now
-        #temperature=0.22
-    )
+    if is_o1:
+        chat_completion = await client.chat.completions.create(
+            messages=messages,
+            model=model,
+            # NOTE(dbp 2024/9/24): no temp in o1-mini for now
+            #temperature=0.22
+        )
+    else:
+        chat_completion = await client.chat.completions.create(
+            messages=messages,
+            model=model,
+            temperature=0.22
+        )
 
     #Output token usage
     #ts = tokenizer.encode(str(chat_completion.choices[0].message.content))
@@ -109,9 +119,14 @@ def get_prompt_using_config(problem, code, assignment, config, dep_code):
     has_dependencies = (dep_code != "")
     has_context = (problem.context.strip() != "")
     has_code = (code.strip() != "")
+    prompt = ""
+
+    # system prompt (now here because o1-mini doesn't have system prompts)
+    if config["model"] == "o1-mini":
+        prompt += config["system"] + "\n\n"
 
     # general prompt
-    prompt = get_prompt_for("general", problem, config)
+    prompt += get_prompt_for("general", problem, config)
 
     # context (i.e. if the instructor provided extra instructions or data definitions at the top of the code)
     if has_context:

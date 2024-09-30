@@ -34,7 +34,7 @@ def batch_test(sub_folder_path, config_folder_path, result_folder_path, assignme
                 config_name = config.split('.')[0]
                 result_path = os.path.join(result_folder_path, f"{sub_name}---{config_name}---{i}.json")
 
-                process(spec_path, assignment_path, sub_path, config_path, prob_num, None, result_path, None, None, False)
+                process(spec_path, assignment_path, sub_path, config_path, prob_num, None, result_path, None, None, True)
                 time.sleep(10)
 
                 with open(result_path, 'r') as result:
