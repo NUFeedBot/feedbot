@@ -49,6 +49,15 @@ async def make_api_request(model, client, prompt, prob_path, sysmsg=None):
     
     return chat_completion.choices[0].message.content
 
+def render_path(p):
+    return ", ".join(p)
+
+def find_with_path(l, p):
+    for r in l:
+        if r["path"] == render_path(p.path):
+            return r
+    return None
+
 # Gets a response from OpenAI, given the OpenAI client, the assignment, student submission, 
 # and config. probs is an int index of a problem to check. 
 # If omitted, all problems are tested.
@@ -60,7 +69,9 @@ async def get_comment(client, assignment, submission, config, prob=None):
         probs = assignment.problems
     else:
         probs = [assignment.problems[prob]]
-    return await asyncio.gather(*[get_comment_on_prob(client, assignment, submission, p, config) for p in probs])
+    res = await asyncio.gather(*[get_comment_on_prob(client, assignment, submission, p, config) for p in probs])
+    reordered = [find_with_path(res, p) for p in probs]
+    return [x for x in reordered if x is not None]
 
 # Gets a response from OpenAI for a particular problem number, 
 # given the OpenAI client, asignment, student submission, the problem, and config 
@@ -72,7 +83,7 @@ async def get_comment_on_prob(client, assignment, submission, problem, config):
         dependencies_code = submission.extract_responses(problem.dependencies)
 
         res = {
-            "path" : ", ".join(problem.path),
+            "path" : render_path(problem.path),
             "prompt" : "none",
             "text" : "none",
             "code" : code
@@ -88,7 +99,7 @@ async def get_comment_on_prob(client, assignment, submission, problem, config):
     except:
         logging.exception('')
         res = {
-            "path": "ERROR",
+            "path": render_path(problem.path),
             "prompt": "ERROR",
             "text": "ERROR",
             "code": "ERROR"
