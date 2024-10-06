@@ -28,7 +28,6 @@ def validateJson(jsondata):
     """
 
     if not isinstance(jsondata, dict): raise MetaDataError("JSON metadata must be a dict")
-    if not json_has(jsondata, "contexts", list): raise MetaDataError("Assignment must have problem contexts")
     if not json_has(jsondata, "title", str): raise MetaDataError("Assignment must have title")
     if not json_has(jsondata, "problems", list): raise MetaDataError("Assignment must have problems")
     for prob in jsondata["problems"]: 
