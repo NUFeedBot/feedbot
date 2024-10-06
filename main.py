@@ -41,40 +41,44 @@ def process(assignment_spec_path,
 
         assignment = AssignmentStatement.load(assignment_spec_path, assignment_template_path)
         submission = SubmissionTemplate.load(submission_path)
-        #subdata = slice_submission(submission_path)
-        #if not subdata.has_all_problems(range(len(assignment.problems))):
-        #    raise InvalidSubmission("Submission does not have all problems", -1)
         if not disable_dry_run:
             dummy_url = "dummy.url.io"
             print(dummy_url)
             return
-        client = AsyncOpenAI(api_key=key)
-        answer = asyncio.run(get_comment(client, assignment, submission, config, problem_number))
+
+
+        #client = AsyncOpenAI(api_key=key)
+        #answer = asyncio.run(get_comment(client, assignment, submission, config, problem_number))
         output = {}
 
-        if results_path:
-            output = answer
-        elif not post_url:
-            print("\n\n\n\nModel Output:")
-            for part in answer:
-                print(f"\n\n=============================\n")
-                path = part['path'].split(", ")
-                print(f"{submission_path}: {'=>'.join(path)}\n")
-                print(part['code'])
-                print(f"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
-                print(part['text'])
-                print(f"\n=============================\n\n")
+        #if results_path:
+        #    output = answer
+        #elif not post_url:
+            # print("\n\n\n\nModel Output:")
+            # for part in answer:
+            #     print(f"\n\n=============================\n")
+            #     path = part['path'].split(", ")
+            #     print(f"{submission_path}: {'=>'.join(path)}\n")
+            #     print(part['code'])
+            #     print(f"\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
+            #     print(part['text'])
+            #     print(f"\n=============================\n\n")
 
 
         if post_url:
-            response = send_request(
-                post_url,
-                post_key,
-                answer,
-                submitter_email
-            )
+            request_obj = {
+                'email': submitter_email,
+                'key': post_key,
+                'config': config,
+                'spec': json.loads(open(assignment_spec_path).read())['assignment'],
+                'template': open(assignment_template_path).read(),
+                'submission': open(submission_path).read(),
+                'problem': problem_number
+            }
+
+            response = requests.post(post_url + "/submission", json=request_obj)
             if response.status_code == 200:
-                url = post_url + "/submission/" + json.loads(response.text)['msg'][4:]
+                url = post_url + "/submission/" + json.loads(response.text)['id']
                 output["output"] = f"Feedbot automated feedback available at [{url}]({url})."
                 output["output_format"] = "md"
                 print(url)
@@ -86,20 +90,21 @@ def process(assignment_spec_path,
                 json.dump(output, results_file)
 
 # Sends a POST request to the given URL, using the given list of comments
-# (str (URL), List[Comment], str (Email)) -> Response
-def send_request(url, key, comments, submitter_email):
-    addendum = 'entry'
+def send_request(url, key, assignment, submission, problem_number, submitter_email):
+    if problem_number is None:
+        probs = assignment.problems
+    else:
+        probs = [assignment.problems[problem_number]]
+    parts = {", ".join(p.path) : (submission.at(p.path, True).contents(), submission.extract_responses(p.dependencies)) for p in probs}
+
 
     request_obj = {
-        'comments':
-            {
-                "comments": comments
-            },
+        'parts': parts,
         'email': submitter_email,
         'key': key
     }
 
-    return requests.post(url + "/" + addendum, json=request_obj)
+    return requests.post(url + "/submission", json=request_obj)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
