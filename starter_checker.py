@@ -28,7 +28,9 @@ def submission_uses_starter(output_lines, submission_path, template_path):
     output_lines.append("Lines starting with '-' are missing from your submission.")
     output_lines.append("Lines starting with '+' are extra lines in your submission.")
     output_lines.append("")
+    output_lines.append("```")
     output_lines.extend(diff)
+    output_lines.append("```")
     return False
 
 def remove_show_hide_lines(file_path: Path):
