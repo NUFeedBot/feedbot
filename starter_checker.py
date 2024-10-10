@@ -12,8 +12,6 @@ def submission_uses_starter(output_lines, submission_path, template_path):
     MESSAGE = "Does the submission follow the starter file?"
     
     template_lines = _extract_template_lines(Path(template_path))
-    
-    remove_show_hide_lines(submission_path)
     submission_lines = _extract_template_lines(Path(submission_path))
 
     if template_lines == submission_lines:
@@ -32,16 +30,6 @@ def submission_uses_starter(output_lines, submission_path, template_path):
     output_lines.extend(diff)
     output_lines.append("```")
     return False
-
-def remove_show_hide_lines(file_path: Path):
-    """rewrites the file, removing all show/hide lines"""
-    with open(file_path, "r") as file:
-        lines = file.readlines()
-    
-    filtered_lines = [line for line in lines if not line.startswith((";;!show", ";;!hide"))]
-
-    with open(file_path, "w") as file:
-        file.writelines(filtered_lines)
 
 def _extract_template_lines(file: Path):
     """

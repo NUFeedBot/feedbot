@@ -6,7 +6,12 @@ RESPONSE_MARKER = ";;!!"
 class SubmissionTemplate:
     @staticmethod
     def load(path):
-        return SubmissionTemplate([l.rstrip("\n") for l in open(path).readlines()])
+        with open(path, "r") as file:
+            lines = file.readlines()
+        
+        #remove show/hide lines internally from this submission, to make testing reference solution easier
+        filtered_lines = [line.rstrip("\n") for line in lines if not line.startswith((";;!show", ";;!hide"))]
+        return SubmissionTemplate(filtered_lines)
 
     def __init__(self, lines: List[str]):
         self.lines = lines
